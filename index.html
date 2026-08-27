@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%23b69be0'/%3E%3Ctext x='256' y='330' text-anchor='middle' font-size='280' fill='white' font-family='serif'%3E✦%3C/text%3E%3C/svg%3E">
     <title>我de心愿瓶</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Noto+Serif+SC:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        /* 全局：仅将数字（含小数点、百分号）统一为宋体，其余文字保持原字体 */
         @font-face {
             font-family: 'DigitSong';
             src: local('Songti SC'), local('Songti'), local('STSong'), local('SimSun'), local('NSimSun'), local('宋体');
@@ -35,45 +37,45 @@
             font-family: 'Cormorant Garamond', Georgia, serif;
             font-style: italic;
             font-weight: 300;
-            font-size: 32px;
-            letter-spacing: 0.02em;
+            font-size: 33px;
+            letter-spacing: 0.06em;
             color: #a588c0;
             line-height: 1;
             margin-bottom: 2px;
         }
         .header .cn-title {
             font-family: 'Noto Serif SC', 'Songti SC', serif;
-            font-weight: 480;
+            font-weight: 470;
             font-size: 18px;
-            letter-spacing: 0.12em;
+            letter-spacing: 0.26em;
             color: #503b63;
             margin-bottom: 2px;
         }
         .header .sub-en {
             font-family: 'Cormorant Garamond', Georgia, serif;
             font-style: italic;
-            font-weight: 280;
+            font-weight: 290;
             font-size: 14px;
             color: #ab95be;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.05em;
         }
 
         /* ===== 卡片 ===== */
         .card {
-            background: rgba(255, 250, 252, 0.82);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            background: rgba(255, 250, 252, 0.78);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-radius: 28px;
             padding: 18px 18px;
             margin-bottom: 14px;
-            border: 1px solid rgba(175, 140, 200, 0.18);
-            box-shadow: 0 8px 32px rgba(130, 88, 168, 0.07), 0 2px 8px rgba(170, 138, 196, 0.04);
+            border: 1px solid rgba(185, 148, 212, 0.15);
+            box-shadow: 0 8px 38px rgba(135, 85, 172, 0.09), 0 2px 8px rgba(176, 141, 204, 0.05);
         }
         .card-title {
             font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
-            font-weight: 460;
-            font-size: 17px;
-            letter-spacing: 0.04em;
+            font-weight: 490;
+            font-size: 18px;
+            letter-spacing: 0.055em;
             color: #463359;
             margin-bottom: 12px;
             display: flex;
@@ -83,10 +85,10 @@
         .card-title .en-deco {
             font-family: 'Cormorant Garamond', serif;
             font-style: italic;
-            font-weight: 260;
+            font-weight: 280;
             font-size: 13px;
             color: #ab95be;
-            letter-spacing: 0.02em;
+            letter-spacing: 0.04em;
         }
 
         /* ===== 数据看板 ===== */
@@ -97,24 +99,24 @@
             text-align: center;
         }
         .stat-item {
-            background: rgba(245, 238, 251, 0.62);
-            border-radius: 18px;
+            background: rgba(243, 234, 250, 0.55);
+            border-radius: 21px;
             padding: 10px 2px;
-            border: 1px solid rgba(180, 150, 205, 0.10);
+            border: 1px solid rgba(184, 152, 209, 0.08);
         }
         .stat-num {
             font-family: 'DigitSong', 'Cormorant Garamond', Georgia, serif;
-            font-weight: 440;
+            font-weight: 460;
             font-size: 24px;
-            letter-spacing: 0.01em;
+            letter-spacing: 0.02em;
             color: #362747;
             line-height: 1.2;
         }
         .stat-label {
             font-family: 'Cormorant Garamond', serif;
-            font-weight: 320;
+            font-weight: 350;
             font-size: 11px;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.065em;
             text-transform: uppercase;
             color: #856f99;
             margin-top: 1px;
@@ -122,11 +124,11 @@
 
         /* ===== 心愿 ===== */
         .goal-item {
-            background: rgba(248, 242, 253, 0.76);
-            border-radius: 16px;
+            background: rgba(244, 237, 250, 0.68);
+            border-radius: 18px;
             padding: 9px 12px;
             margin-bottom: 6px;
-            border: 1px solid rgba(190, 162, 215, 0.12);
+            border: 1px solid rgba(192, 164, 217, 0.10);
         }
         .goal-line1 {
             display: flex;
@@ -135,10 +137,10 @@
         }
         .goal-name {
             font-family: 'Noto Serif SC', serif;
-            font-weight: 500;
+            font-weight: 510;
             font-size: 14px;
             color: #322444;
-            letter-spacing: 0.02em;
+            letter-spacing: 0.038em;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -157,7 +159,7 @@
             margin-left: auto;
             flex-shrink: 0;
             font-family: 'DigitSong', 'Cormorant Garamond', serif;
-            font-weight: 500;
+            font-weight: 520;
             font-size: 13px;
             color: #503b63;
         }
@@ -165,20 +167,20 @@
             flex: 1;
             height: 5px;
             background: #e7daf0;
-            border-radius: 20px;
+            border-radius: 50px;
             overflow: hidden;
         }
         .bar-fill {
             height: 100%;
             width: 0%;
             background: linear-gradient(90deg, #cfaee8, #a882ce);
-            border-radius: 20px;
+            border-radius: 50px;
             transition: width 0.3s;
         }
         .goal-pct {
             flex-shrink: 0;
             font-family: 'DigitSong', 'Cormorant Garamond', serif;
-            font-weight: 420;
+            font-weight: 440;
             font-size: 13px;
             color: #674d7c;
             min-width: 34px;
@@ -196,13 +198,13 @@
             background: #c8afe0;
             color: #382849;
             border: none;
-            border-radius: 30px;
-            padding: 3px 12px;
+            border-radius: 46px;
+            padding: 4px 12px;
             font-size: 11px;
-            font-weight: 440;
+            font-weight: 460;
             cursor: pointer;
             white-space: nowrap;
-            letter-spacing: 0.025em;
+            letter-spacing: 0.042em;
             transition: background 0.15s;
         }
         .buy-btn:disabled {
@@ -230,17 +232,17 @@
             width: 100%;
             padding: 10px;
             border: 1.5px dashed #d8c4e8;
-            border-radius: 24px;
-            background: rgba(240, 230, 249, 0.23);
+            border-radius: 56px;
+            background: rgba(236, 224, 247, 0.29);
             color: #775f8b;
             font-family: 'Noto Serif SC', serif;
             font-size: 14px;
             cursor: pointer;
             margin-top: 6px;
-            letter-spacing: 0.035em;
+            letter-spacing: 0.058em;
             transition: background 0.15s;
         }
-        .add-btn:hover { background: rgba(235, 222, 247, 0.43); }
+        .add-btn:hover { background: rgba(233, 218, 246, 0.49); }
 
         .empty-hint {
             font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
@@ -249,7 +251,7 @@
             text-align: center;
             padding: 12px 0 6px;
             font-size: 14px;
-            letter-spacing: 0.02em;
+            letter-spacing: 0.036em;
         }
 
         /* ===== 已实现折叠 ===== */
@@ -263,13 +265,13 @@
             padding: 6px 0;
             width: 100%;
             text-align: left;
-            letter-spacing: 0.02em;
+            letter-spacing: 0.034em;
         }
         .fold-body { display: none; margin-top: 4px; }
         .fold-body.open { display: block; }
         .achieve-item {
             background: #efe6f5;
-            border-radius: 16px;
+            border-radius: 18px;
             padding: 8px 12px;
             margin-bottom: 4px;
             display: flex;
@@ -277,14 +279,14 @@
             gap: 8px;
             font-size: 13px;
             color: #523f63;
-            border: 1px solid rgba(195, 165, 220, 0.10);
+            border: 1px solid rgba(198, 169, 223, 0.08);
         }
         .achieve-item .restore {
             margin-left: auto;
             background: #dcc6ee;
             border: none;
-            border-radius: 30px;
-            padding: 2px 14px;
+            border-radius: 54px;
+            padding: 3px 14px;
             font-size: 11px;
             cursor: pointer;
             font-family: 'Noto Serif SC', serif;
@@ -323,21 +325,21 @@
         .date-nav button:hover { color: #936fb0; }
         .date-nav .mid {
             font-family: 'DigitSong', 'Cormorant Garamond', 'Noto Serif SC', serif;
-            font-weight: 420;
+            font-weight: 435;
             font-size: 17px;
             color: #382749;
-            letter-spacing: 0.02em;
+            letter-spacing: 0.026em;
         }
         .date-nav .today {
             font-family: 'Noto Serif SC', serif;
             background: #e4d6ef;
             border: none;
-            border-radius: 40px;
+            border-radius: 70px;
             padding: 3px 14px;
             font-size: 12px;
             color: #422f57;
             cursor: pointer;
-            letter-spacing: 0.02em;
+            letter-spacing: 0.033em;
         }
 
         /* ===== 任务 ===== */
@@ -345,16 +347,16 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            background: rgba(246, 239, 252, 0.58);
-            border-radius: 20px;
+            background: rgba(241, 232, 249, 0.51);
+            border-radius: 22px;
             padding: 10px 12px;
             margin-bottom: 6px;
-            border: 1px solid rgba(195, 167, 218, 0.08);
+            border: 1px solid rgba(197, 171, 219, 0.07);
         }
         .task-check {
             width: 22px;
             height: 22px;
-            border-radius: 30px;
+            border-radius: 66px;
             border: 2px solid #cfb8e3;
             display: flex;
             align-items: center;
@@ -371,9 +373,9 @@
             font-family: 'Noto Serif SC', serif;
             font-size: 14px;
             color: #302340;
-            letter-spacing: 0.012em;
+            letter-spacing: 0.019em;
         }
-        .task-name.line { text-decoration: line-through; opacity: 0.45; }
+        .task-name.line { text-decoration: line-through; opacity: 0.41; }
         .task-line {
             display: flex;
             align-items: center;
@@ -396,36 +398,38 @@
             font-family: 'Noto Serif SC', serif;
             background: #e4d6ef;
             padding: 0 10px;
-            border-radius: 30px;
+            border-radius: 74px;
             font-size: 10px;
             color: #402e53;
-            letter-spacing: 0.02em;
+            letter-spacing: 0.029em;
         }
         .del-task {
             color: #cf91b0;
-            font-size: 14px;
+            font-size: 16px;
             cursor: pointer;
-            opacity: 0.37;
+            opacity: 0.34;
             padding: 4px;
             transition: opacity 0.12s;
         }
-        .del-task:hover { opacity: 0.8; }
+        .del-task:hover { opacity: 0.75; }
 
         .add-task-row {
             display: flex;
             gap: 6px;
             margin-top: 8px;
+            width: 100%;
         }
         .add-task-row input {
             flex: 1;
+            min-width: 0;
             border: 1px solid #dcc6ee;
-            border-radius: 40px;
+            border-radius: 77px;
             padding: 9px 16px;
             font-size: 14px;
-            background: rgba(254, 250, 255, 0.7);
+            background: rgba(254, 250, 255, 0.73);
             outline: none;
             font-family: 'DigitSong', 'Noto Serif SC', serif;
-            letter-spacing: 0.01em;
+            letter-spacing: 0.014em;
             color: #332544;
         }
         .add-task-row input::placeholder { color: #b59fc7; font-style: italic; }
@@ -435,13 +439,15 @@
             background: #c8afe0;
             border: none;
             color: #382849;
-            border-radius: 40px;
-            padding: 9px 18px;
+            border-radius: 83px;
+            padding: 9px 16px;
             font-size: 13px;
-            font-weight: 430;
+            font-weight: 445;
             cursor: pointer;
             white-space: nowrap;
-            letter-spacing: 0.02em;
+            flex-shrink: 0;
+            min-width: 56px;
+            letter-spacing: 0.031em;
             transition: background 0.12s;
         }
         .add-task-row button:hover { background: #bb9fd7; }
@@ -456,12 +462,12 @@
             font-family: 'Noto Serif SC', serif;
             background: #ede3f5;
             border: none;
-            border-radius: 40px;
+            border-radius: 70px;
             padding: 3px 14px;
             font-size: 11px;
             color: #452f5b;
             cursor: pointer;
-            letter-spacing: 0.018em;
+            letter-spacing: 0.026em;
             transition: background 0.12s;
         }
         .type-toggle button.active { background: #c8afe0; color: #2d1e3e; }
@@ -471,17 +477,17 @@
         .note-area textarea {
             width: 100%;
             border: 1px solid #dcc6ee;
-            border-radius: 20px;
+            border-radius: 24px;
             padding: 12px 16px;
             font-size: 14px;
-            background: rgba(254, 250, 255, 0.65);
+            background: rgba(254, 250, 255, 0.61);
             resize: vertical;
-            min-height: 84px;
+            min-height: 94px;
             outline: none;
             font-family: 'DigitSong', 'Noto Serif SC', serif;
-            letter-spacing: 0.008em;
+            letter-spacing: 0.009em;
             color: #2d1f3b;
-            line-height: 1.6;
+            line-height: 1.7;
         }
         .note-area textarea::placeholder { color: #bda8cf; font-style: italic; }
         .note-area textarea:focus { border-color: #c3a6dc; }
@@ -490,14 +496,14 @@
             background: #c8afe0;
             color: #382849;
             border: none;
-            border-radius: 40px;
+            border-radius: 77px;
             padding: 6px 20px;
             font-size: 13px;
-            font-weight: 425;
+            font-weight: 437;
             cursor: pointer;
             margin-top: 8px;
             align-self: flex-end;
-            letter-spacing: 0.022em;
+            letter-spacing: 0.037em;
             transition: background 0.12s;
         }
         .note-area .save-note:hover { background: #bb9fd7; }
@@ -507,32 +513,32 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(100, 67, 132, 0.31);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            z-index: 888;
+            background: rgba(105, 70, 137, 0.28);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 900;
             justify-content: center;
             align-items: center;
             padding: 24px;
         }
         .modal {
-            background: rgba(255, 250, 252, 0.86);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            max-width: 375px;
+            background: rgba(255, 250, 252, 0.89);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            max-width: 380px;
             width: 100%;
-            border-radius: 36px;
+            border-radius: 46px;
             padding: 28px 24px 30px;
-            border: 1px solid rgba(210, 182, 228, 0.18);
-            box-shadow: 0 24px 60px rgba(80, 47, 112, 0.15);
+            border: 1px solid rgba(214, 186, 232, 0.15);
+            box-shadow: 0 28px 66px rgba(81, 46, 115, 0.14);
         }
         .modal h2 {
             font-family: 'Noto Serif SC', serif;
-            font-weight: 480;
+            font-weight: 495;
             font-size: 19px;
             color: #352647;
             margin-bottom: 16px;
-            letter-spacing: 0.045em;
+            letter-spacing: 0.066em;
         }
         .field { margin-bottom: 12px; }
         .field label {
@@ -541,31 +547,31 @@
             color: #624d76;
             display: block;
             margin-bottom: 3px;
-            letter-spacing: 0.016em;
+            letter-spacing: 0.027em;
         }
         .field input {
             width: 100%;
             padding: 10px 16px;
             border: 1px solid #dcc6ee;
-            border-radius: 24px;
+            border-radius: 44px;
             font-size: 15px;
-            background: rgba(254, 250, 255, 0.7);
+            background: rgba(254, 250, 255, 0.73);
             outline: none;
             font-family: 'DigitSong', 'Noto Serif SC', serif;
             color: #2f2041;
-            letter-spacing: 0.005em;
+            letter-spacing: 0.007em;
         }
         .field input:focus { border-color: #c3a6dc; }
         .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
         .modal-actions button {
             flex: 1;
             padding: 12px 0;
-            border-radius: 40px;
+            border-radius: 666px;
             border: none;
             font-size: 15px;
             cursor: pointer;
             font-family: 'Noto Serif SC', serif;
-            letter-spacing: 0.028em;
+            letter-spacing: 0.043em;
             transition: background 0.12s;
         }
         .btn-cancel { background: #e4d6ef; color: #412d57; }
@@ -577,15 +583,14 @@
             text-align: center;
             font-family: 'Cormorant Garamond', serif;
             font-style: italic;
-            font-weight: 270;
+            font-weight: 285;
             font-size: 13px;
             color: #b098c2;
             margin-top: 8px;
-            letter-spacing: 0.032em;
+            letter-spacing: 0.048em;
         }
 
-        /* ===== 响应式微调 ===== */
-        @media (max-width: 360px) {
+        @media (max-width: 374px) {
             .header .en-title { font-size: 28px; }
             .stat-num { font-size: 20px; }
         }
@@ -636,7 +641,7 @@
         </div>
 
         <!-- 任务 -->
-        <div style="margin-bottom:6px;font-family:'Noto Serif SC',serif;font-weight:440;font-size:14px;color:#3e2b52;letter-spacing:0.024em;">今日任务</div>
+        <div style="margin-bottom:6px;font-family:'Noto Serif SC',serif;font-weight:455;font-size:14px;color:#3e2b52;letter-spacing:0.039em;">今日任务</div>
         <div id="taskList"></div>
         <div class="add-task-row">
             <input type="text" id="taskInput" placeholder="如 自己做饭 +20">
@@ -649,7 +654,7 @@
 
         <!-- 今日随笔 -->
         <div class="note-area" style="margin-top:14px;">
-            <div style="font-family:'Noto Serif SC',serif;font-weight:440;font-size:14px;color:#3e2b52;margin-bottom:6px;letter-spacing:0.024em;">今日随笔</div>
+            <div style="font-family:'Noto Serif SC',serif;font-weight:453;font-size:14px;color:#3e2b52;margin-bottom:6px;letter-spacing:0.039em;">今日随笔</div>
             <textarea id="noteInput" placeholder="今天发生了什么……"></textarea>
             <button class="save-note" id="saveNote">保存随笔</button>
         </div>
@@ -765,7 +770,6 @@
         const ds = fmt(viewDate);
         const rec = getRec(ds);
         document.getElementById('dateLabel').textContent = ds + ' 周' + week(viewDate);
-        // 仅在浏览非今日日期时显示「今天」快捷跳转按钮
         document.getElementById('todayBtn').style.visibility = ds === fmt(new Date()) ? 'hidden' : 'visible';
         const tasks = getDayTasks(ds);
         const el = document.getElementById('taskList');
