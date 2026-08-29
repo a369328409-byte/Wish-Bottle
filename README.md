@@ -1,4 +1,4 @@
-# 我的心愿瓶 · Wish Bottle
+# Wish Bottle
 
 > a little jar for today's wishes
 
