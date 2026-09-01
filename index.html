@@ -722,6 +722,81 @@
             .header .en-title { font-size: 28px; }
             .stat-num { font-size: 20px; }
         }
+
+        /* ===== 桌面端双列布局（≥900px） ===== */
+        @media (min-width: 900px) {
+            body {
+                padding: 16px 20px 24px;
+                align-items: flex-start;
+            }
+            .container {
+                max-width: 900px;
+                max-height: calc(100vh - 40px);
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+                gap: 12px 20px;
+            }
+            /* 桌面端看板和心愿清单卡片内部更紧凑 */
+            .container > .card:nth-child(2),
+            .container > .card:nth-child(3) { padding: 14px 16px; }
+            .container > .card:nth-child(4) { padding: 14px 16px; }
+            /* 桌面端 grid 布局中，card 间距由 grid gap 控制，去掉自身 margin-bottom */
+            .container > .card { margin-bottom: 0; min-height: 0; overflow: hidden; }
+            .header { grid-column: 1 / -1; grid-row: 1; }
+            /* 数据看板：保持自身高度，不被拉伸 */
+            .container > .card:nth-child(2) { grid-column: 1; grid-row: 2; align-self: start; }
+            /* 心愿清单：flex 列布局，撑满 row 3 与右栏底部对齐 */
+            .container > .card:nth-child(3) {
+                grid-column: 1; grid-row: 3;
+                display: flex; flex-direction: column;
+            }
+            /* 日记本：跨 row 2-3，flex 列布局 */
+            .container > .card:nth-child(4) {
+                grid-column: 2;
+                grid-row: 2 / span 2;
+                display: flex; flex-direction: column;
+            }
+            .footer { grid-column: 1 / -1; grid-row: 4; }
+            .theme-dots { grid-column: 1 / -1; grid-row: 5; }
+
+            /* 列表：flex:1 自适应撑满卡片剩余空间，内容多时滚动 */
+            /* 日记本子元素：允许被压缩，确保内部滚动生效 */
+            .container > .card:nth-child(3) > *,
+            .container > .card:nth-child(4) > * { min-height: 0; }
+            #goalList {
+                flex: 1;
+                min-height: 80px;
+                overflow-y: auto;
+            }
+            /* 任务列表：精确计算高度，6 条左右 */
+            #taskList {
+                min-height: 240px;
+                max-height: 400px;
+                flex: 1;
+                overflow-y: auto;
+            }
+            /* 随笔区域：固定高度不参与 flex 扩展 */
+            .note-area { flex: 0 0 auto; margin-top: 10px; }
+            .note-area textarea {
+                height: 60px;
+                min-height: 48px;
+                max-height: 80px;
+                overflow-y: auto;
+            }
+            /* 美化滚动条 */
+            #goalList::-webkit-scrollbar,
+            #taskList::-webkit-scrollbar { width: 5px; }
+            #goalList::-webkit-scrollbar-track,
+            #taskList::-webkit-scrollbar-track { background: transparent; }
+            #goalList::-webkit-scrollbar-thumb,
+            #taskList::-webkit-scrollbar-thumb {
+                background: var(--primary-soft);
+                border-radius: 10px;
+            }
+            #goalList::-webkit-scrollbar-thumb:hover,
+            #taskList::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+        }
     </style>
 </head>
 <body>
@@ -771,14 +846,7 @@
         <!-- 任务 -->
         <div style="margin-bottom:6px;font-family:'Noto Serif SC',serif;font-weight:455;font-size:14px;color:var(--text-main);letter-spacing:0.039em;">今日任务</div>
         <div id="taskList"></div>
-        <div class="add-task-row">
-            <input type="text" id="taskInput" placeholder="如 自己做饭 +20">
-            <button id="addTaskBtn">添加</button>
-        </div>
-        <div class="type-toggle">
-            <button class="active" id="cycBtn">🔄 循环</button>
-            <button id="onceBtn">🧩 单次</button>
-        </div>
+        <button class="add-btn" id="showTaskModal">＋ 写个小任务</button>
 
         <!-- 今日随笔 -->
         <div class="note-area" style="margin-top:14px;">
@@ -811,6 +879,26 @@
         <div class="modal-actions">
             <button class="btn-cancel" id="cancelGoal">取消</button>
             <button class="btn-confirm" id="confirmGoal">存入心愿瓶</button>
+        </div>
+    </div>
+</div>
+
+<!-- 新增任务弹窗 -->
+<div class="overlay" id="taskOverlay">
+    <div class="modal">
+        <h2>今天做点什么</h2>
+        <div class="field"><label>任务名称</label><input type="text" id="tName" placeholder="如 睡前看半小时书"></div>
+        <div class="field"><label>奖励金币</label><input type="number" id="tReward" placeholder="10" min="1" value="10"></div>
+        <div class="field">
+            <label>任务类型</label>
+            <div class="type-toggle" id="taskTypeToggle" style="margin-top:6px;">
+                <button class="active" data-type="cyclic">🔄 循环</button>
+                <button data-type="once">🧩 单次</button>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-cancel" id="cancelTask">取消</button>
+            <button class="btn-confirm" id="confirmTask">写入日记本</button>
         </div>
     </div>
 </div>
@@ -997,22 +1085,34 @@
     document.getElementById('todayBtn').onclick = () => { viewDate = new Date(); renderAll(); };
 
     let taskIsCyclic = true;
-    document.getElementById('cycBtn').onclick = function() { this.classList.add('active'); document.getElementById('onceBtn').classList.remove('active'); taskIsCyclic=true; };
-    document.getElementById('onceBtn').onclick = function() { this.classList.add('active'); document.getElementById('cycBtn').classList.remove('active'); taskIsCyclic=false; };
 
-    document.getElementById('addTaskBtn').onclick = function() {
-        const inp = document.getElementById('taskInput');
-        const raw = inp.value.trim();
-        if(!raw) return;
-        let name = raw;
-        let reward = 10;
-        const m = raw.match(/[+＋](\d+(\.\d+)?)|(\d+(\.\d+)?)[💰元]/);
-        if(m) {
-            const num = parseFloat(m[1] || m[3]);
-            if(num && num>0) reward = num;
-            name = raw.replace(/[+＋]\d+(\.\d+)?|\d+(\.\d+)?[💰元]/g,'').trim();
-            if(!name) name = '任务';
-        }
+    // 任务弹窗：类型切换
+    document.getElementById('taskTypeToggle').onclick = function(e) {
+        const btn = e.target.closest('button');
+        if(!btn) return;
+        const isCyc = btn.dataset.type === 'cyclic';
+        taskIsCyclic = isCyc;
+        this.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
+    };
+
+    // 打开/关闭任务弹窗
+    document.getElementById('showTaskModal').onclick = function() {
+        // 重置表单
+        document.getElementById('tName').value = '';
+        document.getElementById('tReward').value = 10;
+        taskIsCyclic = true;
+        document.getElementById('taskTypeToggle').querySelectorAll('button').forEach(b => {
+            b.classList.toggle('active', b.dataset.type === 'cyclic');
+        });
+        document.getElementById('taskOverlay').style.display = 'flex';
+    };
+    document.getElementById('cancelTask').onclick = () => document.getElementById('taskOverlay').style.display = 'none';
+
+    // 确认添加任务
+    document.getElementById('confirmTask').onclick = function() {
+        const name = document.getElementById('tName').value.trim();
+        const reward = parseFloat(document.getElementById('tReward').value) || 10;
+        if(!name) { alert('请填写任务名称'); return; }
         const ds = fmt(viewDate);
         if(taskIsCyclic) {
             const id = uid();
@@ -1023,8 +1123,16 @@
             const rec = getRec(ds);
             rec.tasks.push({id:uid(), name, reward, done:false, isCyclic:false});
         }
-        inp.value = '';
+        document.getElementById('taskOverlay').style.display = 'none';
         save(); renderAll();
+    };
+
+    // 弹窗背景点击关闭
+    document.getElementById('taskOverlay').onclick = function(e) {
+        if(e.target === this) this.style.display = 'none';
+    };
+    document.getElementById('goalOverlay').onclick = function(e) {
+        if(e.target === this) this.style.display = 'none';
     };
 
     document.getElementById('saveNote').onclick = function() {
