@@ -194,6 +194,34 @@
             color: var(--text-soft);
             letter-spacing: 0.04em;
         }
+        .title-add {
+            margin-left: auto;
+            border: none;
+            background: var(--tint);
+            color: var(--primary-deep);
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            font-size: 17px;
+            line-height: 1;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.15s, background 0.15s;
+        }
+        .title-add:hover { background: var(--primary-soft); transform: scale(1.08); }
+        .section-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-family: 'Noto Serif SC', serif;
+            font-weight: 455;
+            font-size: 14px;
+            color: var(--text-main);
+            letter-spacing: 0.039em;
+        }
 
         /* ===== 数据看板 ===== */
         .stats-grid {
@@ -507,6 +535,194 @@
             color: var(--primary-soft-text);
             letter-spacing: 0.029em;
         }
+
+        /* ===== 任务分组 ===== */
+        .gdot {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        /* 弹窗：分组选择行 + 悬浮下拉 */
+        .group-picker-wrap { margin-top: 6px; }
+        .group-current {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 9px 16px;
+            border: 1px solid var(--input-border);
+            border-radius: 22px;
+            background: var(--input-bg);
+            font-family: 'Noto Serif SC', serif;
+            font-size: 13.5px;
+            color: var(--text-main);
+            cursor: pointer;
+            letter-spacing: 0.02em;
+        }
+        .group-current .caret { margin-left: auto; font-size: 10px; color: var(--text-sub); }
+        .group-dropdown {
+            margin-top: 6px;
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            background: var(--card-bg);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+            padding: 4px 4px 6px;
+            max-height: 260px;
+            overflow-y: auto;
+        }
+        .gd-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 8px;
+            border-radius: 10px;
+            font-size: 13px;
+            color: var(--text-main);
+            font-family: 'Noto Serif SC', serif;
+            position: relative;
+        }
+        .gd-item .gd-drag { color: var(--text-soft); cursor: grab; padding: 1px 3px; font-size: 13px; line-height: 1; }
+        .gd-item .gd-drag:active { cursor: grabbing; }
+        .gd-item .gd-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .gd-edit-btns { display: flex; gap: 1px; flex-shrink: 0; }
+        .gd-edit-btns button {
+            border: none;
+            background: transparent;
+            color: var(--text-sub);
+            padding: 2px 4px;
+            border-radius: 6px;
+            cursor: pointer;
+            line-height: 1;
+            font-size: 13px;
+        }
+        .gd-edit-btns button svg { display: block; width: 13px; height: 13px; }
+        .gd-edit-btns button:hover { background: var(--tint); color: var(--primary-deep); }
+        .gd-edit-btns button.danger:hover { color: var(--del-color); }
+        .gd-item .gd-rename-input {
+            flex: 1;
+            min-width: 0;
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            padding: 3px 7px;
+            font-size: 12.5px;
+            background: var(--input-bg);
+            outline: none;
+            color: var(--text-main);
+            font-family: 'Noto Serif SC', serif;
+        }
+        .gd-item.gd-default .gd-drag { visibility: hidden; }
+        .gd-item.gd-selected { background: var(--tint); }
+        .gd-item.gd-selected .gd-label { font-weight: 550; }
+        .gd-item.dragging { opacity: 0.4; }
+        .gd-item.drag-over { background: var(--tint-strong); }
+        .gd-confirm {
+            flex-wrap: wrap;
+            gap: 4px;
+            font-size: 12px;
+            padding: 5px 8px;
+            background: var(--tint);
+            border-radius: 10px;
+        }
+        .gd-confirm .gd-tip { width: 100%; color: var(--text-sub); font-size: 11.5px; }
+        .gd-confirm button {
+            border: 1px solid var(--input-border);
+            background: var(--card-bg);
+            color: var(--text-main);
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Noto Serif SC', serif;
+        }
+        .gd-confirm button.danger { border-color: var(--del-color); color: var(--del-color); }
+        .gd-new-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 8px 4px;
+            margin-top: 4px;
+            border-top: 1px solid var(--tint-strong);
+            font-family: 'Noto Serif SC', serif;
+            font-size: 12.5px;
+        }
+        .gd-new-label {
+            color: var(--text-sub);
+            font-size: 12.5px;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            padding: 2px 0;
+            border-radius: 8px;
+        }
+        .gd-new-label:hover { color: var(--primary-deep); background: var(--tint); }
+        .gd-new-input { display: flex; gap: 3px; flex: 1; min-width: 0; align-items: center; }
+        .gd-new-input input {
+            flex: 1; min-width: 0;
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            padding: 3px 7px;
+            font-size: 13px;
+            background: var(--input-bg);
+            outline: none;
+            color: var(--text-main);
+            font-family: 'Noto Serif SC', serif;
+            line-height: 1.3;
+        }
+        /* ===== 列表：分组块 ===== */
+        .task-group { margin-bottom: 8px; }
+        .task-group-head {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 4px 6px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .tg-name {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 12.5px;
+            font-weight: 500;
+            color: var(--text-sub);
+            letter-spacing: 0.04em;
+        }
+        .tg-progress {
+            font-family: 'DigitSong', 'Noto Serif SC', serif;
+            font-size: 11.5px;
+            color: var(--text-soft);
+        }
+        .tg-arrow {
+            margin-left: auto;
+            font-size: 10px;
+            color: var(--text-soft);
+            transition: transform 0.2s ease;
+        }
+        .task-group.collapsed .tg-arrow { transform: rotate(-90deg); }
+        .task-group-body {
+            max-height: 1200px;
+            overflow: hidden;
+            opacity: 1;
+            transition: max-height 0.24s ease, opacity 0.18s ease;
+        }
+        .task-group.collapsed .task-group-body { max-height: 0; opacity: 0; }
+        .task-group.collapsed { margin-bottom: 2px; }
+        .group-idle-hint { display: none; }
+        /* 随笔折叠 */
+        .note-head { transition: transform 0.2s ease; }
+        .note-body {
+            display: flex; flex-direction: column; gap: 4px;
+            transition: max-height 0.22s ease, opacity 0.18s ease, margin-top 0.18s ease;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+        /* 展开态 */
+        .note-area:not(.collapsed) .note-body { max-height: 300px; opacity: 1; }
+        /* 折叠态：note-body 完全隐藏，note-area 高度收缩到只剩标题一行 */
+        .note-area.collapsed .note-body {
+            max-height: 0; opacity: 0; margin-top: 0;
+        }
+        .note-area.collapsed .tg-arrow { transform: rotate(180deg); }
         .del-task {
             color: var(--del-color);
             font-size: 16px;
@@ -559,21 +775,22 @@
         .date-range span { font-size: 12px; color: var(--text-sub); flex-shrink: 0; }
 
         /* ===== 随笔 ===== */
-        .note-area { display: flex; flex-direction: column; }
         .note-area textarea {
             width: 100%;
             border: 1px solid var(--input-border);
             border-radius: 24px;
-            padding: 12px 16px;
-            font-size: 14px;
+            padding: 8px 12px;
+            font-size: 13px;
             background: var(--input-bg);
-            resize: vertical;
-            min-height: 94px;
+            resize: none;
             outline: none;
             font-family: 'DigitSong', 'Noto Serif SC', serif;
             letter-spacing: 0.009em;
             color: var(--text-main);
-            line-height: 1.7;
+            line-height: 1.5;
+            box-sizing: border-box;
+            overflow-y: hidden;
+            max-height: 120px;
         }
         .note-area textarea::placeholder { color: var(--text-soft); font-style: italic; }
         .note-area textarea:focus { border-color: var(--input-focus); }
@@ -583,14 +800,13 @@
             color: var(--btn-text);
             border: none;
             border-radius: 77px;
-            padding: 6px 20px;
-            font-size: 13px;
+            padding: 4px 16px;
+            font-size: 12px;
             font-weight: 437;
             cursor: pointer;
-            margin-top: 8px;
-            align-self: flex-end;
             letter-spacing: 0.037em;
             transition: background 0.12s;
+            align-self: flex-end;
         }
         .note-area .save-note:hover { background: var(--primary-hover); }
 
@@ -628,6 +844,15 @@
             margin-bottom: 16px;
             letter-spacing: 0.066em;
         }
+        .modal > p {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 13.5px;
+            color: var(--text-sub);
+            line-height: 1.55;
+            margin-bottom: 14px;
+            letter-spacing: 0.027em;
+        }
+        .modal > p .hi { color: var(--text-main); font-weight: 550; }
         .field { margin-bottom: 12px; }
         .field label {
             font-family: 'Noto Serif SC', serif;
@@ -710,21 +935,21 @@
         /* ===== 桌面端双列布局（≥900px） ===== */
         @media (min-width: 900px) {
             body {
-                padding: 16px 20px 24px;
+                padding: 8px 16px 12px;
                 align-items: flex-start;
             }
             .container {
                 max-width: 900px;
-                max-height: calc(100vh - 40px);
+                max-height: calc(100vh - 20px);
                 display: grid;
                 grid-template-columns: 1fr 1fr;
                 grid-template-rows: auto auto minmax(0, 1fr) auto auto;
-                gap: 12px 20px;
+                gap: 8px 18px;
             }
             /* 桌面端看板和心愿清单卡片内部更紧凑 */
             .container > .card:nth-child(2),
-            .container > .card:nth-child(3) { padding: 14px 16px; }
-            .container > .card:nth-child(4) { padding: 14px 16px; }
+            .container > .card:nth-child(3) { padding: 12px 14px; }
+            .container > .card:nth-child(4) { padding: 12px 14px; }
             /* 桌面端 grid 布局中，card 间距由 grid gap 控制，去掉自身 margin-bottom */
             .container > .card { margin-bottom: 0; min-height: 0; overflow: hidden; }
             .header { grid-column: 1 / -1; grid-row: 1; }
@@ -760,14 +985,8 @@
                 flex: 1;
                 overflow-y: auto;
             }
-            /* 随笔区域：固定高度不参与 flex 扩展 */
+            /* 随笔区域：自然高度，textarea 自动撑开；taskList flex:1 吸收剩余 */
             .note-area { flex: 0 0 auto; margin-top: 10px; }
-            .note-area textarea {
-                height: 60px;
-                min-height: 48px;
-                max-height: 80px;
-                overflow-y: auto;
-            }
             /* 美化滚动条 */
             #goalList::-webkit-scrollbar,
             #taskList::-webkit-scrollbar { width: 5px; }
@@ -805,13 +1024,12 @@
 
     <!-- 心愿清单 -->
     <div class="card">
-        <div class="card-title">心愿清单 <span class="en-deco">· my wishes</span></div>
+        <div class="card-title">心愿清单 <span class="en-deco">· my wishes</span> <button class="title-add" id="showGoalModal" title="许个心愿">＋</button></div>
         <div id="goalList"></div>
         <div class="fold-section">
             <button class="fold-toggle" id="foldBtn">▶ 已实现 (<span id="achCount">0</span>)</button>
             <div class="fold-body" id="achBody"></div>
         </div>
-        <button class="add-btn" id="showGoalModal">＋ 许个小心愿</button>
     </div>
 
     <!-- 日记本：按天 -->
@@ -828,15 +1046,19 @@
         </div>
 
         <!-- 任务 -->
-        <div style="margin-bottom:6px;font-family:'Noto Serif SC',serif;font-weight:455;font-size:14px;color:var(--text-main);letter-spacing:0.039em;">今日任务</div>
+        <div class="section-head"><span>今日任务</span><button class="title-add" id="showTaskModal" title="写个小任务">＋</button></div>
         <div id="taskList"></div>
-        <button class="add-btn" id="showTaskModal">＋ 写个小任务</button>
 
         <!-- 今日随笔 -->
-        <div class="note-area" style="margin-top:14px;">
-            <div style="font-family:'Noto Serif SC',serif;font-weight:453;font-size:14px;color:var(--text-main);margin-bottom:6px;letter-spacing:0.039em;">今日随笔</div>
-            <textarea id="noteInput" placeholder="今天发生了什么……"></textarea>
-            <button class="save-note" id="saveNote">保存随笔</button>
+        <div class="note-area" id="noteArea">
+            <div class="section-head note-head" onclick="toggleNoteCollapse()">
+                <span>今日随笔</span>
+                <span class="tg-arrow">▾</span>
+            </div>
+            <div class="note-body" id="noteBody">
+                <textarea id="noteInput" placeholder="今天发生了什么……"></textarea>
+                <button class="save-note" id="saveNote">保存随笔</button>
+            </div>
         </div>
     </div>
 
@@ -873,6 +1095,13 @@
         <h2>今天做点什么</h2>
         <div class="field"><label>任务名称</label><input type="text" id="tName" placeholder="如 睡前看半小时书"></div>
         <div class="field"><label>奖励金币</label><input type="number" id="tReward" placeholder="10" min="1" value="10"></div>
+        <div class="field" id="groupField">
+            <label>任务分组</label>
+            <div class="group-picker-wrap">
+                <button type="button" class="group-current" id="groupCurrent"><span class="gdot" id="groupCurrentDot" style="background:var(--text-soft)"></span><span id="groupCurrentName">默认分组</span><span class="caret">▾</span></button>
+                <div class="group-dropdown" id="groupDropdown" style="display:none;"></div>
+            </div>
+        </div>
         <div class="field">
             <label>任务类型</label>
             <div class="type-toggle" id="taskTypeToggle">
@@ -898,6 +1127,22 @@
     </div>
 </div>
 
+<!-- 删除分组确认弹窗 -->
+<div class="overlay" id="confirmDeleteOverlay" style="display:none;">
+    <div class="modal">
+        <h2>删除分组</h2>
+        <p>
+            确定要删除「<span class="hi" id="delGroupName"></span>」吗？<br>
+            组内任务如何处理？
+        </p>
+        <div class="modal-actions">
+            <button class="btn-cancel" id="delMoveBtn">移至未分组</button>
+            <button class="btn-confirm" id="delRemoveBtn">一并删除</button>
+            <button class="btn-cancel" id="delCancelBtn">取消</button>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 <script>
     // ====== 数据 ======
@@ -905,9 +1150,17 @@
     let achieved = [];
     let cyclicTasks = [];
     let dailyRecords = {};
+    let groups = [];            // 用户分组：{id, name, color}，顺序即展示顺序
+    let collapsedGroups = {};   // {groupId: true} 折叠状态
+    let noteCollapsed = false;  // 随笔区折叠
     let saved = 0;
     let spent = 0;
     let viewDate = new Date();
+
+    const GROUP_PALETTE = ['#c8afe0','#79b8e0','#8fbf9f','#e8a87c','#e89ab0','#c9a84c','#9db4e8','#cf9f74','#7ec9b8','#d99ac8'];
+    const DEFAULT_COLOR = '#b9b2c4';
+    function nextGroupColor() { return GROUP_PALETTE[groups.length % GROUP_PALETTE.length]; }
+    function getGroup(id) { return groups.find(g => g.id === id); }
 
     function fmt(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
     function week(d) { return ['日','一','二','三','四','五','六'][d.getDay()]; }
@@ -919,6 +1172,9 @@
             const a=localStorage.getItem('oc_achieved'); if(a) achieved=JSON.parse(a);
             const c=localStorage.getItem('oc_cyclic'); if(c) cyclicTasks=JSON.parse(c);
             const d=localStorage.getItem('oc_daily'); if(d) dailyRecords=JSON.parse(d);
+            const gp=localStorage.getItem('oc_groups'); if(gp) groups=JSON.parse(gp);
+            const cg=localStorage.getItem('oc_collapsed'); if(cg) collapsedGroups=JSON.parse(cg);
+            const nc=localStorage.getItem('oc_noteCollapsed'); if(nc) noteCollapsed=nc==='true';
             const sv=localStorage.getItem('oc_saved'); if(sv) saved=parseFloat(sv)||0;
             const sp=localStorage.getItem('oc_spent'); if(sp) spent=parseFloat(sp)||0;
         }catch(e){}
@@ -928,6 +1184,9 @@
         localStorage.setItem('oc_achieved',JSON.stringify(achieved));
         localStorage.setItem('oc_cyclic',JSON.stringify(cyclicTasks));
         localStorage.setItem('oc_daily',JSON.stringify(dailyRecords));
+        localStorage.setItem('oc_groups',JSON.stringify(groups));
+        localStorage.setItem('oc_collapsed',JSON.stringify(collapsedGroups));
+        localStorage.setItem('oc_noteCollapsed', noteCollapsed ? 'true' : 'false');
         localStorage.setItem('oc_saved',saved.toString());
         localStorage.setItem('oc_spent',spent.toString());
     }
@@ -965,9 +1224,9 @@
             .filter(ct => isScheduledOn(ct, ds))
             .map(ct => {
                 const exist = rec.tasks.find(t => t.id===ct.id && t.isCyclic);
-                return { id:ct.id, name:ct.name, reward:ct.reward, done:exist?exist.done:false, isCyclic:true, cycleType: ct.cycleType || 'daily' };
+                return { id:ct.id, name:ct.name, reward:ct.reward, done:exist?exist.done:false, isCyclic:true, cycleType: ct.cycleType || 'daily', group: (exist && exist.group != null) ? exist.group : (ct.group || '') };
             });
-        const once = rec.tasks.filter(t => !t.isCyclic).map(t => ({...t, cycleType: 'once'}));
+        const once = rec.tasks.filter(t => !t.isCyclic).map(t => ({...t, cycleType: 'once', group: t.group || ''}));
         return [...cyc, ...once];
     }
 
@@ -1011,6 +1270,13 @@
         ).join('');
     }
 
+    function autoResizeNote() {
+        const el = document.getElementById('noteInput');
+        if (!el) return;
+        el.style.height = 'auto';
+        el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+    }
+
     function renderDayView() {
         const ds = fmt(viewDate);
         const rec = getRec(ds);
@@ -1018,21 +1284,55 @@
         document.getElementById('todayBtn').style.visibility = ds === fmt(new Date()) ? 'hidden' : 'visible';
         const tasks = getDayTasks(ds);
         const el = document.getElementById('taskList');
-        if(!tasks.length) { el.innerHTML='<div class="empty-hint">添加今天的任务吧</div>'; return; }
-        let doneCnt=0;
-        el.innerHTML = tasks.map(t => {
-            if(t.done) doneCnt++;
+        const noteInput = document.getElementById('noteInput');
+        if(!tasks.length) { el.innerHTML='<div class="empty-hint">添加今天的任务吧</div>'; noteInput.value = rec.note || ''; autoResizeNote(); return; }
+
+        // 按分组归类：默认分组 '' 置顶，其余按用户定义顺序；未知分组归入默认
+        const buckets = new Map();
+        tasks.forEach(t => {
+            let gid = t.group || '';
+            if(gid && !getGroup(gid)) gid = '';
+            if(!buckets.has(gid)) buckets.set(gid, []);
+            buckets.get(gid).push(t);
+        });
+        const order = ['', ...groups.map(g => g.id)].filter(gid => buckets.has(gid));
+
+        const typeLabels = { once:'单次', daily:'每日', weekly:'每周', monthly:'每月', custom:'自定义' };
+        const taskItemHTML = t => {
             const chkCls = t.done?'task-check done':'task-check';
             const nameCls = t.done?'task-name line':'task-name';
-            const typeLabels = { once:'单次', daily:'每日', weekly:'每周', monthly:'每月', custom:'自定义' };
             const badge = `<span class="badge">${typeLabels[t.cycleType] || '单次'}</span>`;
             return `<div class="task-item">
                 <div class="${chkCls}" onclick="toggleTask('${t.id}','${ds}')">${t.done?'✓':''}</div>
                 <div class="task-info"><div class="task-line"><span class="${nameCls}">${esc(t.name)}</span>${badge}<span class="task-meta">+${t.reward}💰</span></div></div>
                 <div class="del-task" onclick="delDayTask('${t.id}','${ds}')">✕</div>
             </div>`;
-        }).join('');
-        document.getElementById('noteInput').value = rec.note || '';
+        };
+
+        let html = '';
+        order.forEach(gid => {
+            const list = buckets.get(gid);
+            const doneN = list.filter(t => t.done).length;
+            const g = getGroup(gid);
+            const name = g ? g.name : '默认分组';
+            const color = g ? g.color : DEFAULT_COLOR;
+            const collapsed = !!collapsedGroups[gid];
+            html += `<div class="task-group${collapsed?' collapsed':''}">
+                <div class="task-group-head" onclick="toggleGroupCollapse('${gid}')">
+                    ${groupDotHTML(color)}
+                    <span class="tg-name">${esc(name)}</span>
+                    <span class="tg-progress">${doneN}/${list.length}</span>
+                    <span class="tg-arrow">▾</span>
+                </div>
+                <div class="task-group-body">${list.map(taskItemHTML).join('')}</div>
+            </div>`;
+        });
+        el.innerHTML = html;
+        noteInput.value = rec.note || '';
+        autoResizeNote();
+        // 应用随笔折叠状态
+        const noteArea = document.getElementById('noteArea');
+        if(noteArea) noteArea.classList.toggle('collapsed', noteCollapsed);
     }
 
     window.doAchieve = function(i) {
@@ -1069,7 +1369,7 @@
                 if(exist.done) { exist.done=false; saved-=cyclicTasks[ci].reward; }
                 else { exist.done=true; saved+=cyclicTasks[ci].reward; }
             } else {
-                rec.tasks.push({id, name:cyclicTasks[ci].name, reward:cyclicTasks[ci].reward, done:true, isCyclic:true});
+                rec.tasks.push({id, name:cyclicTasks[ci].name, reward:cyclicTasks[ci].reward, done:true, isCyclic:true, group: cyclicTasks[ci].group || ''});
                 saved+=cyclicTasks[ci].reward;
             }
         } else {
@@ -1107,6 +1407,222 @@
     document.getElementById('nextDay').onclick = () => { viewDate.setDate(viewDate.getDate()+1); renderAll(); };
     document.getElementById('todayBtn').onclick = () => { viewDate = new Date(); renderAll(); };
 
+    // ====== 任务分组 ======
+    let selectedGroup = '';     // 弹窗当前选中分组 id，'' = 默认分组
+    let deletingGroupId = null; // 管理面板中待确认删除的分组
+    let renamingGroupId = null; // 管理面板中正在重命名的分组
+
+    function groupDotHTML(color) {
+        return `<span class="gdot" style="background:${color}"></span>`;
+    }
+    function groupColorOf(id) {
+        const g = getGroup(id);
+        return g ? g.color : DEFAULT_COLOR;
+    }
+
+    function renderGroupCurrent() {
+        const g = getGroup(selectedGroup);
+        document.getElementById('groupCurrentName').textContent = g ? g.name : '默认分组';
+        document.getElementById('groupCurrentDot').style.background = g ? g.color : DEFAULT_COLOR;
+    }
+
+    function renderGroupPicker() {
+        const el = document.getElementById('groupDropdown');
+        const ICON_DRAG = GM_ICON.drag;
+        const ICON_REN = GM_ICON.rename;
+        const ICON_TRASH = GM_ICON.trash;
+        const rowHTML = (gid, name, color, isDefault, isRenaming) => {
+            if(isRenaming) {
+                return `<div class="gd-item" data-gid="${gid}">
+                    <span class="gd-drag">${ICON_DRAG}</span>
+                    <input class="gd-rename-input" id="gdRename_${gid}" value="${esc(name)}" maxlength="8">
+                    <span class="gd-edit-btns">
+                        <button onclick="saveRenameGroup('${gid}'); renderGroupPicker();" title="保存">✓</button>
+                        <button onclick="cancelRenameGroup(); renderGroupPicker();" title="取消">✕</button>
+                    </span>
+                </div>`;
+            }
+            const dragCls = isDefault ? 'gd-default' : '';
+            const selCls = gid === selectedGroup ? 'gd-selected' : '';
+            const dragAttr = isDefault ? '' : `draggable="true"`;
+            return `<div class="gd-item ${dragCls} ${selCls}" data-gid="${gid}" ${dragAttr} onclick="selectTaskGroup('${gid}')">
+                <span class="gd-drag">${ICON_DRAG}</span>
+                ${groupDotHTML(color)}
+                <span class="gd-label">${esc(name)}</span>
+                ${gid === selectedGroup ? '<span style="font-size:11px;color:var(--primary-deep)">✓</span>' : ''}
+                <span class="gd-edit-btns" onclick="event.stopPropagation()">
+                    ${isDefault ? '' : `<button title="重命名" onclick="startRenameGroup('${gid}')">${ICON_REN}</button>`}
+                    ${isDefault ? '' : `<button title="删除" class="danger" onclick="askDeleteGroup('${gid}')">${ICON_TRASH}</button>`}
+                </span>
+            </div>`;
+        };
+        let html = '';
+        html += rowHTML('', '默认分组', DEFAULT_COLOR, true, false);
+        groups.forEach(g => {
+            if(renamingGroupId === g.id) html += rowHTML(g.id, g.name, g.color, false, true);
+            else html += rowHTML(g.id, g.name, g.color, false, false);
+        });
+        // 底部 + 新建分组（非重命名状态时显示）
+        if(!renamingGroupId) {
+            html += `<div class="gd-new-row" id="gdNewRow"><span class="gd-new-label">＋ 新建分组</span></div>`;
+        }
+        el.innerHTML = html;
+
+        // 拖拽绑定（自定义/默认不拖）
+        let dragSrc = null;
+        el.querySelectorAll('.gd-item[draggable="true"]').forEach(row => {
+            row.addEventListener('dragstart', e => { dragSrc = row.dataset.gid; row.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
+            row.addEventListener('dragend', () => { row.classList.remove('dragging'); el.querySelectorAll('.gd-item.drag-over').forEach(r=>r.classList.remove('drag-over')); dragSrc=null; });
+            row.addEventListener('dragover', e => e.preventDefault());
+            row.addEventListener('dragenter', e => { e.preventDefault(); if(row.dataset.gid!==dragSrc) row.classList.add('drag-over'); });
+            row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+            row.addEventListener('drop', e => {
+                e.preventDefault(); row.classList.remove('drag-over');
+                if(!dragSrc || row.dataset.gid===dragSrc) return;
+                const si = groups.findIndex(g=>g.id===dragSrc), ti = groups.findIndex(g=>g.id===row.dataset.gid);
+                if(si<0||ti<0||si===ti) return;
+                const [item]=groups.splice(si,1); groups.splice(ti,0,item);
+                save(); renderGroupPicker();
+            });
+        });
+
+        // 新建分组交互
+        const newRow = document.getElementById('gdNewRow');
+        if(newRow) {
+            newRow.onclick = () => {
+                const row = document.getElementById('gdNewRow');
+                row.outerHTML = `<div class="gd-new-row" id="gdNewInputRow"><div class="gd-new-input"><input type="text" id="gdNewInput" placeholder="分组名称" maxlength="8"><span class="gd-edit-btns"><button onclick="window.commitNewGroup()" title="确定">✓</button><button onclick="window.cancelNewGroup()" title="取消">✕</button></span></div></div>`;
+                const inp = document.getElementById('gdNewInput');
+                inp.focus();
+                inp.onkeydown = (e) => {
+                    if(e.key==='Enter') commitNewGroup();
+                    if(e.key==='Escape') cancelNewGroup();
+                };
+            };
+        }
+        const inp = document.getElementById('gdNewInput');
+        if(inp) {
+            inp.focus();
+            inp.onkeydown = (e) => {
+                if(e.key==='Enter') commitNewGroup();
+                if(e.key==='Escape') cancelNewGroup();
+            };
+        }
+    }
+    function commitNewGroup() {
+        const inp = document.getElementById('gdNewInput');
+        const name = inp.value.trim();
+        if(!name) { renderGroupPicker(); return; }
+        if(groups.some(g => g.name === name)) { alert('分组名已存在'); inp.focus(); return; }
+        const g = {id: uid(), name, color: nextGroupColor()};
+        groups.push(g);
+        selectedGroup = g.id;
+        save();
+        renderGroupCurrent();
+        renderGroupPicker();
+        renderDayView();
+    }
+    function cancelNewGroup() { renderGroupPicker(); }
+    // 暴露给 innerHTML 里的 onclick
+    window.commitNewGroup = commitNewGroup;
+    window.cancelNewGroup = cancelNewGroup;
+
+    // 简约平面 SVG 图标（无依赖）
+    const GM_ICON = {
+        drag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="5" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="19" r="1"/></svg>',
+        rename: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4z"/></svg>',
+        trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a2 2 0 012-2h2a2 2 0 012 2v2"/></svg>'
+    };
+
+    window.selectTaskGroup = function(id) {
+        selectedGroup = id;
+        document.getElementById('groupDropdown').style.display = 'none';
+        renderGroupCurrent();
+    };
+    window.startRenameGroup = function(id) { renamingGroupId = id; deletingGroupId = null; renderGroupPicker(); };
+    window.cancelRenameGroup = function() { renamingGroupId = null; renderGroupPicker(); };
+    window.saveRenameGroup = function(id) {
+        const inp = document.getElementById('gdRename_' + id);
+        const name = inp ? inp.value.trim() : '';
+        if(!name) { alert('分组名不能为空'); return; }
+        if(groups.some(g => g.id!==id && g.name===name)) { alert('分组名已存在'); return; }
+        const g = getGroup(id);
+        if(g) g.name = name;
+        renamingGroupId = null;
+        save(); renderGroupPicker(); renderGroupCurrent();
+    };
+    window.askDeleteGroup = function(id) {
+        deletingGroupId = id;
+        renamingGroupId = null;
+        const g = groups.find(x => x.id === id);
+        document.getElementById('delGroupName').textContent = g ? g.name : '';
+        document.getElementById('confirmDeleteOverlay').style.display = 'flex';
+    };
+    window.cancelDeleteGroup = function() {
+        deletingGroupId = null;
+        document.getElementById('confirmDeleteOverlay').style.display = 'none';
+    };
+    window.deleteGroup = function(id, removeTasks) {
+        const g = getGroup(id);
+        if(!g) return;
+        if(removeTasks) {
+            // 删除组内所有任务，退还其已获得的金币
+            cyclicTasks = cyclicTasks.filter(ct => {
+                if(ct.group !== id) return true;
+                for(const k in dailyRecords) {
+                    dailyRecords[k].tasks = dailyRecords[k].tasks.filter(t => {
+                        if(t.id === ct.id && t.isCyclic) { if(t.done) saved = Math.max(0, saved - ct.reward); return false; }
+                        return true;
+                    });
+                }
+                return false;
+            });
+            for(const k in dailyRecords) {
+                dailyRecords[k].tasks = dailyRecords[k].tasks.filter(t => {
+                    if(t.group === id) { if(t.done) saved = Math.max(0, saved - (t.reward||0)); return false; }
+                    return true;
+                });
+            }
+        } else {
+            // 组内任务移至默认分组
+            cyclicTasks.forEach(ct => { if(ct.group === id) ct.group = ''; });
+            for(const k in dailyRecords) {
+                dailyRecords[k].tasks.forEach(t => { if(t.group === id) t.group = ''; });
+            }
+        }
+        groups = groups.filter(x => x.id !== id);
+        delete collapsedGroups[id];
+        if(selectedGroup === id) selectedGroup = '';
+        deletingGroupId = null;
+        document.getElementById('confirmDeleteOverlay').style.display = 'none';
+        save();
+        renderGroupPicker(); renderGroupCurrent();
+        renderAll();
+    };
+    // 删除分组弹窗按钮绑定
+    document.getElementById('delMoveBtn').onclick = () => { if(deletingGroupId) deleteGroup(deletingGroupId, false); };
+    document.getElementById('delRemoveBtn').onclick = () => { if(deletingGroupId) deleteGroup(deletingGroupId, true); };
+    document.getElementById('delCancelBtn').onclick = () => cancelDeleteGroup();
+    document.getElementById('confirmDeleteOverlay').onclick = function(e) { if(e.target === this) cancelDeleteGroup(); };
+    window.toggleGroupCollapse = function(id) {
+        collapsedGroups[id] = !collapsedGroups[id];
+        save(); renderDayView();
+    };
+    window.toggleNoteCollapse = function() {
+        noteCollapsed = !noteCollapsed;
+        save();
+        const area = document.getElementById('noteArea');
+        if(area) area.classList.toggle('collapsed', noteCollapsed);
+    };
+
+    document.getElementById('groupCurrent').onclick = function(e) {
+        e.stopPropagation();
+        const dd = document.getElementById('groupDropdown');
+        const show = dd.style.display === 'none';
+        dd.style.display = show ? 'block' : 'none';
+        if(show) { deletingGroupId = null; renamingGroupId = null; renderGroupPicker(); }
+    };
+
     // 任务类型状态：'once'|'daily'|'weekly'|'monthly'|'custom'
     let taskType = 'once';
 
@@ -1130,6 +1646,10 @@
             b.classList.toggle('active', b.dataset.type === 'once');
         });
         document.getElementById('customDateField').style.display = 'none';
+        selectedGroup = '';
+        deletingGroupId = null; renamingGroupId = null;
+        document.getElementById('groupDropdown').style.display = 'none';
+        renderGroupCurrent();
         document.getElementById('taskOverlay').style.display = 'flex';
     };
     document.getElementById('cancelTask').onclick = () => document.getElementById('taskOverlay').style.display = 'none';
@@ -1142,11 +1662,11 @@
         const ds = fmt(viewDate);
         if(taskType === 'once') {
             const rec = getRec(ds);
-            rec.tasks.push({id:uid(), name, reward, done:false, isCyclic:false, type:'once'});
+            rec.tasks.push({id:uid(), name, reward, done:false, isCyclic:false, type:'once', group: selectedGroup});
         } else {
             const id = uid();
             const now = new Date();
-            const ct = {id, name, reward, cycleType: taskType};
+            const ct = {id, name, reward, cycleType: taskType, group: selectedGroup};
             // 锚点：每周=创建当天的星期几(0-6)，每月=创建当天的几号(1-31)
             if(taskType === 'weekly') ct.weekday = now.getDay();
             if(taskType === 'monthly') ct.monthday = now.getDate();
@@ -1159,7 +1679,7 @@
             if(isScheduledOn(ct, ds)) {
                 const rec = getRec(ds);
                 if(!rec.tasks.find(t => t.id===id && t.isCyclic)) {
-                    rec.tasks.push({id, name, reward, done:false, isCyclic:true, type:taskType});
+                    rec.tasks.push({id, name, reward, done:false, isCyclic:true, type:taskType, group: selectedGroup});
                 }
             }
         }
@@ -1182,6 +1702,7 @@
         save();
         alert('📝 随笔已保存');
     };
+    document.getElementById('noteInput').addEventListener('input', autoResizeNote);
 
     document.getElementById('showGoalModal').onclick = () => document.getElementById('goalOverlay').style.display='flex';
     document.getElementById('cancelGoal').onclick = () => document.getElementById('goalOverlay').style.display='none';
