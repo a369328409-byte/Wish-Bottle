@@ -484,7 +484,11 @@
             padding: 10px 12px;
             margin-bottom: 6px;
             border: 1px solid var(--tint-border);
+            cursor: pointer;
+            transition: background 0.15s;
         }
+        .task-item:not(.no-focus):hover { background: var(--tint-strong); }
+        .task-item.no-focus { cursor: default; }
         .task-check {
             width: 22px;
             height: 22px;
@@ -534,6 +538,15 @@
             font-size: 10px;
             color: var(--primary-soft-text);
             letter-spacing: 0.029em;
+            flex-shrink: 0;
+        }
+        /* 专注累计时长：跟在类型标签后面 */
+        .focus-time {
+            flex-shrink: 0;
+            white-space: nowrap;
+            font-family: 'DigitSong', 'Cormorant Garamond', serif;
+            font-size: 12px;
+            color: var(--text-sub);
         }
 
         /* ===== 任务分组 ===== */
@@ -809,6 +822,323 @@
             align-self: flex-end;
         }
         .note-area .save-note:hover { background: var(--primary-hover); }
+
+        /* ===== 专注模式 ===== */
+        .focus-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 950;
+            background: linear-gradient(165deg, var(--bg-1) 0%, var(--bg-2) 100%);
+            flex-direction: column;
+            align-items: center;
+            padding: 22px 18px 26px;
+            overflow: hidden;
+        }
+        .focus-close {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            width: 38px;
+            height: 38px;
+            border: none;
+            background: transparent;
+            border-radius: 50%;
+            color: var(--text-sub);
+            font-size: 19px;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s, color 0.15s;
+        }
+        .focus-close:hover { background: var(--tint); color: var(--text-main); }
+        .focus-head {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 28px;
+            flex-shrink: 0;
+        }
+        .focus-task-name {
+            font-family: 'Noto Serif SC', serif;
+            font-weight: 510;
+            font-size: 20px;
+            color: var(--text-main);
+            letter-spacing: 0.05em;
+            max-width: 78vw;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .focus-tag {
+            margin-top: 8px;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 12px;
+            color: var(--primary-soft-text);
+            background: var(--primary-soft);
+            padding: 2px 14px;
+            border-radius: 74px;
+            letter-spacing: 0.04em;
+            max-width: 78vw;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .focus-modes { margin-top: 18px; width: 268px; flex-shrink: 0; }
+        .focus-modes button { font-size: 14px; padding: 8px 0; }
+        /* 计时中锁定模式切换（保留点击以便提示，不做禁用样式穿透） */
+        .focus-modes.locked { opacity: .45; }
+        .focus-modes.locked button { cursor: not-allowed; }
+        /* 阶段提示（番茄钟第 N 轮 / 休息中）：与上方模式切换的间隔对齐「默认分组 → 模式切换」的 18px
+           常驻占位只切可见性（visibility），保证三种模式下头部高度一致 → 时钟位置不随模式移动 */
+        .focus-phase {
+            display: flex;
+            visibility: hidden;
+            align-items: center;
+            gap: 6px;
+            margin-top: 18px;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 12px;
+            letter-spacing: 0.05em;
+            color: var(--text-sub);
+            padding: 2px 12px;
+            border-radius: 74px;
+            min-height: 22px;
+        }
+        .focus-phase.show { visibility: visible; }
+        .focus-phase svg { width: 13px; height: 13px; flex-shrink: 0; }
+        /* 行内平面图标（金币 / 打勾等），尺寸跟随字号 */
+        .ic-inline { width: 1em; height: 1em; vertical-align: -0.13em; margin-left: 1px; flex-shrink: 0; }
+        .focus-phase.is-break { color: #5c8f6c; background: rgba(143,191,159,0.18); }
+        /* 休息阶段：进度环换成柔绿，一眼区分 */
+        .focus-overlay.breaking .ring-prog { stroke: #8fbf9f; }
+        .focus-overlay.breaking .ring-dot { fill: #8fbf9f; }
+        .focus-stage {
+            flex: 1;
+            min-height: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* 三段均分留白：上方 / 时钟与星星之间 / 下方，视觉节奏均匀（时钟因此整体上移） */
+            justify-content: space-evenly;
+            gap: 0;
+        }
+        .ring-wrap {
+            position: relative;
+            width: min(66vw, 44vh, 300px);
+            aspect-ratio: 1 / 1;
+        }
+        .ring-wrap svg { width: 100%; height: 100%; display: block; }
+        .ring-track { fill: none; stroke: var(--input-border); stroke-width: 2; }
+        .ring-prog { fill: none; stroke: var(--text-main); stroke-width: 2.5; stroke-linecap: round; }
+        .ring-dot { fill: var(--text-main); }
+        .ring-time {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'DigitSong', 'Cormorant Garamond', Georgia, serif;
+            font-size: clamp(28px, 8.5vw, 40px);
+            font-weight: 420;
+            color: var(--text-main);
+            letter-spacing: 0.04em;
+        }
+        .focus-flip {
+            display: grid;
+            grid-template-columns: repeat(2, auto);
+            gap: 20px 14px;
+        }
+        .flip-card {
+            width: min(28vw, 19vh, 112px);
+            height: min(28vw, 19vh, 112px);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .flip-card::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 1px;
+            background: var(--input-border);
+            opacity: 0.75;
+        }
+        .flip-digit {
+            position: relative;
+            z-index: 1;
+            font-family: 'DigitSong', 'Cormorant Garamond', Georgia, serif;
+            font-size: min(14vw, 9vh, 58px);
+            font-weight: 500;
+            color: var(--text-main);
+            line-height: 1;
+        }
+        @keyframes flipIn {
+            from { transform: rotateX(-88deg); opacity: 0.15; }
+            to { transform: rotateX(0); opacity: 1; }
+        }
+        .flip-card.flipping .flip-digit { animation: flipIn 0.28s ease; }
+        /* 星星行：常驻占位（display 固定 flex，非番茄钟只隐藏可见性），单行不换行 → 时钟位置三模式一致 */
+        .focus-stars {
+            display: flex;
+            visibility: hidden;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: nowrap;
+            gap: 6px;
+            min-height: 18px;
+            max-width: 280px;
+            overflow: visible;
+        }
+        .focus-stars svg { width: 17px; height: 17px; fill: var(--primary-deep); flex-shrink: 0; }
+        .stars-more {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 12px;
+            color: var(--text-sub);
+            letter-spacing: 0.04em;
+        }
+        .focus-actions { display: flex; gap: 12px; flex-shrink: 0; flex-wrap: wrap; justify-content: center; }
+        /* 三按钮（休息待开始）态：按钮略收窄；整体保持居中（已实测不与右下角工具列重叠） */
+        .focus-actions.compact { gap: 8px; }
+        .focus-actions.compact .focus-btn { padding: 11px 18px; font-size: 14px; }
+        @media (max-width: 359px) {
+            .focus-actions.compact { gap: 6px; }
+            .focus-actions.compact .focus-btn { padding: 11px 12px; font-size: 13px; }
+        }
+        .focus-btn {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 15px;
+            letter-spacing: 0.05em;
+            border: none;
+            border-radius: 666px;
+            padding: 11px 32px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .focus-btn.primary { background: var(--primary); color: var(--btn-text); }
+        .focus-btn.primary:hover { background: var(--primary-hover); }
+        .focus-btn.ghost { background: var(--primary-soft); color: var(--primary-soft-text); }
+        .focus-btn.ghost:hover { background: var(--primary-soft-hover); }
+        .focus-tools {
+            position: absolute;
+            right: 18px;
+            bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+        .focus-tool {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            border: none;
+            background: transparent;
+            color: var(--text-sub);
+            font-family: 'Noto Serif SC', serif;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: color 0.15s;
+        }
+        .focus-tool svg { width: 20px; height: 20px; display: block; }
+        .focus-tool:hover { color: var(--primary-deep); }
+        /* 时钟区：圆环 / 卡片翻页 / 时长滚轮 共用同一容器 */
+        .clock-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: min(66vw, 44vh, 300px);
+            min-height: min(66vw, 44vh, 300px);
+        }
+        .ring-picker {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 64%;
+            height: 132px;
+            overflow: hidden;
+        }
+        .dur-list {
+            height: 100%;
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+            scrollbar-width: none;
+            overscroll-behavior: contain;
+            /* 上下各留一行：3 行视口即可把任意一项（含首项「自定义」）滚到正中，
+               同时让 scrollTop 与 index × 44 严格对应，避免被浏览器钳制后错位 */
+            padding: 44px 0;
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 32%, #000 68%, transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0, #000 32%, #000 68%, transparent 100%);
+        }
+        .dur-list::-webkit-scrollbar { display: none; }
+        .dur-item {
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            scroll-snap-align: center;
+            font-family: 'DigitSong', 'Cormorant Garamond', 'Noto Serif SC', serif;
+            font-size: 16px;
+            color: var(--text-soft);
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.15s, font-size 0.15s;
+        }
+        .dur-item.active { color: var(--text-main); font-size: 22px; }
+        .ring-time.tappable { cursor: pointer; }
+        /* 常用时长管理 */
+        .preset-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            border-radius: 14px;
+            background: var(--tint);
+            margin-bottom: 6px;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 13.5px;
+            color: var(--text-main);
+            letter-spacing: 0.02em;
+        }
+        .preset-row .preset-del {
+            margin-left: auto;
+            border: none;
+            background: transparent;
+            color: var(--del-color);
+            font-size: 14px;
+            line-height: 1;
+            padding: 2px 4px;
+            cursor: pointer;
+            opacity: 0.45;
+            transition: opacity 0.15s;
+        }
+        .preset-row .preset-del:hover { opacity: 1; }
+        .preset-section-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 12.5px;
+            letter-spacing: 0.06em;
+            color: var(--text-sub);
+            margin: 12px 0 6px;
+            text-align: left;
+        }
+        .preset-section-title:first-child { margin-top: 0; }
+        #focusConfirmOverlay { z-index: 1000; }
+        #durCustomOverlay, #presetOverlay { z-index: 1060; }
 
         /* ===== 弹窗 ===== */
         .overlay {
@@ -1143,6 +1473,87 @@
     </div>
 </div>
 
+<!-- 专注模式 -->
+<div class="focus-overlay" id="focusOverlay">
+    <button class="focus-close" id="focusClose" title="关闭">✕</button>
+    <div class="focus-head">
+        <div class="focus-task-name" id="focusTaskName"></div>
+        <div class="focus-tag" id="focusTaskGroup"></div>
+        <div class="type-toggle focus-modes" id="focusModes">
+            <button data-mode="countup">正计时</button>
+            <button data-mode="countdown">倒计时</button>
+            <button data-mode="pomodoro" class="active">番茄钟</button>
+        </div>
+        <div class="focus-phase" id="focusPhase"></div>
+    </div>
+    <div class="focus-stage">
+        <div class="clock-box">
+            <div class="ring-wrap" id="ringWrap">
+                <svg viewBox="0 0 260 260">
+                    <circle class="ring-track" cx="130" cy="130" r="120"></circle>
+                    <circle class="ring-prog" id="ringProg" cx="130" cy="130" r="120" transform="rotate(-90 130 130)"></circle>
+                    <circle class="ring-dot" id="ringDot" cx="130" cy="10" r="5"></circle>
+                </svg>
+                <div class="ring-time" id="ringTime">25:00</div>
+            </div>
+            <div class="focus-flip" id="focusFlip" style="display:none;">
+                <div class="flip-card"><span class="flip-digit" id="fMinT">2</span></div>
+                <div class="flip-card"><span class="flip-digit" id="fMinU">5</span></div>
+                <div class="flip-card"><span class="flip-digit" id="fSecT">0</span></div>
+                <div class="flip-card"><span class="flip-digit" id="fSecU">0</span></div>
+            </div>
+            <div class="ring-picker" id="ringPicker" style="display:none;"><div class="dur-list" id="durList"></div></div>
+        </div>
+        <div class="focus-stars" id="focusStars"></div>
+    </div>
+    <div class="focus-actions" id="focusActions"></div>
+    <div class="focus-tools">
+        <button class="focus-tool" id="focusSoundBtn" title="秒针音效开关"></button>
+        <button class="focus-tool" id="focusStyleBtn" title="切换时钟样式"></button>
+        <button class="focus-tool" id="focusPresetBtn" title="常用时长设置"></button>
+    </div>
+</div>
+
+<!-- 自定义时长 -->
+<div class="overlay" id="durCustomOverlay" style="display:none;">
+    <div class="modal">
+        <h2>自定义时长</h2>
+        <div class="field"><label>分钟</label><input type="number" id="durCustomInput" min="1" max="600" placeholder="30"></div>
+        <div class="modal-actions">
+            <button class="btn-cancel" id="durCustomCancel">取消</button>
+            <button class="btn-confirm" id="durCustomOk">确定</button>
+        </div>
+    </div>
+</div>
+
+<!-- 常用时长设置 -->
+<div class="overlay" id="presetOverlay" style="display:none;">
+    <div class="modal">
+        <h2>常用时长</h2>
+        <div class="preset-section-title">专注时长</div>
+        <div id="presetList"></div>
+        <div id="breakSettingSection">
+            <div class="preset-section-title">休息时长</div>
+            <div id="breakPresetList"></div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-confirm" id="presetDone">完成</button>
+        </div>
+    </div>
+</div>
+
+<!-- 专注模式二次确认 -->
+<div class="overlay" id="focusConfirmOverlay" style="display:none;">
+    <div class="modal">
+        <p id="fcText" style="margin-bottom:6px;">确定要退出专注模式吗？</p>
+        <p style="margin-bottom:0;font-size:12.5px;color:var(--text-sub, #999);">「已完成」= 完成任务并领取金币<br>「放弃」= 丢弃本次计时，任务保持原状</p>
+        <div class="modal-actions">
+            <button class="btn-cancel" id="fcAbandon">放弃</button>
+            <button class="btn-confirm" id="fcComplete">已完成</button>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 <script>
     // ====== 数据 ======
@@ -1224,7 +1635,7 @@
             .filter(ct => isScheduledOn(ct, ds))
             .map(ct => {
                 const exist = rec.tasks.find(t => t.id===ct.id && t.isCyclic);
-                return { id:ct.id, name:ct.name, reward:ct.reward, done:exist?exist.done:false, isCyclic:true, cycleType: ct.cycleType || 'daily', group: (exist && exist.group != null) ? exist.group : (ct.group || '') };
+                return { id:ct.id, name:ct.name, reward:ct.reward, done:exist?exist.done:false, isCyclic:true, cycleType: ct.cycleType || 'daily', group: (exist && exist.group != null) ? exist.group : (ct.group || ''), focusSeconds: exist ? exist.focusSeconds : 0 };
             });
         const once = rec.tasks.filter(t => !t.isCyclic).map(t => ({...t, cycleType: 'once', group: t.group || ''}));
         return [...cyc, ...once];
@@ -1256,7 +1667,7 @@
             const canBuy = saved >= g.price;
             return `<div class="goal-item">
                 <div class="goal-line1"><span class="goal-name">${esc(g.name)}</span>${g.note?`<span class="goal-note" title="${esc(g.note)}">${esc(g.note)}</span>`:''}<span class="goal-price">¥${g.price.toFixed(2)}</span></div>
-                <div class="goal-line2"><div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div><span class="goal-pct">${Math.floor(pct)}%</span><button class="buy-btn" ${canBuy?'':'disabled'} onclick="doAchieve(${i})">${canBuy?'🎉 拿下':'💰 还不够'}</button><span class="goal-del" onclick="delGoal(${i})">✕</span></div>
+                <div class="goal-line2"><div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div><span class="goal-pct">${Math.floor(pct)}%</span><button class="buy-btn" ${canBuy?'':'disabled'} onclick="doAchieve(${i})">${canBuy?ICON.check+' 拿下':ICON.coin+' 还不够'}</button><span class="goal-del" onclick="delGoal(${i})">✕</span></div>
             </div>`;
         }).join('');
     }
@@ -1266,7 +1677,7 @@
         const body = document.getElementById('achBody');
         if(!achieved.length) { body.innerHTML=''; return; }
         body.innerHTML = achieved.map((g,i) =>
-            `<div class="achieve-item"><span>✅ ${esc(g.name)} · ¥${g.price.toFixed(2)}</span><button class="restore" onclick="undoAch(${i})">撤回</button></div>`
+            `<div class="achieve-item"><span>${ICON.done} ${esc(g.name)} · ¥${g.price.toFixed(2)}</span><button class="restore" onclick="undoAch(${i})">撤回</button></div>`
         ).join('');
     }
 
@@ -1302,10 +1713,14 @@
             const chkCls = t.done?'task-check done':'task-check';
             const nameCls = t.done?'task-name line':'task-name';
             const badge = `<span class="badge">${typeLabels[t.cycleType] || '单次'}</span>`;
-            return `<div class="task-item">
-                <div class="${chkCls}" onclick="toggleTask('${t.id}','${ds}')">${t.done?'✓':''}</div>
-                <div class="task-info"><div class="task-line"><span class="${nameCls}">${esc(t.name)}</span>${badge}<span class="task-meta">+${t.reward}💰</span></div></div>
-                <div class="del-task" onclick="delDayTask('${t.id}','${ds}')">✕</div>
+            const focusTime = t.focusSeconds ? `<span class="focus-time">${fmtFocusTime(t.focusSeconds*1000)}</span>` : '';
+            // 已完成任务隐藏专注入口
+            const focusAttr = t.done ? ' no-focus' : '';
+            const focusClick = t.done ? '' : ` onclick="openFocus('${t.id}','${ds}')"`;
+            return `<div class="task-item${focusAttr}"${focusClick}>
+                <div class="${chkCls}" onclick="event.stopPropagation(); toggleTask('${t.id}','${ds}')">${t.done?'✓':''}</div>
+                <div class="task-info"><div class="task-line"><span class="${nameCls}">${esc(t.name)}</span>${badge}${focusTime}<span class="task-meta">+${t.reward}${ICON.coin}</span></div></div>
+                <div class="del-task" onclick="event.stopPropagation(); delDayTask('${t.id}','${ds}')">✕</div>
             </div>`;
         };
 
@@ -1723,8 +2138,588 @@
         this.innerHTML = body.classList.contains('open') ? '▼ 已实现 ('+achieved.length+')' : '▶ 已实现 ('+achieved.length+')';
     };
 
-    function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+    // ====== 专注模式 ======
+    const FOCUS_RING_R = 120;
+    const FOCUS_RING_C = 2*Math.PI*FOCUS_RING_R;
+    const FOCUS_ICON = {
+        flip: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7.5" height="8" rx="1.6"/><rect x="13.5" y="3" width="7.5" height="8" rx="1.6"/><rect x="3" y="13" width="7.5" height="8" rx="1.6"/><rect x="13.5" y="13" width="7.5" height="8" rx="1.6"/></svg>',
+        ring: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="3" r="1.7" fill="currentColor" stroke="none"/></svg>',
+        star: '<svg viewBox="0 0 24 24"><path d="M12 2.4l2.9 6.2 6.8.9-5 4.7 1.3 6.8-6-3.3-6 3.3 1.3-6.8-5-4.7 6.8-.9z"/></svg>',
+        tea: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 9h1a4 4 0 110 8h-1"/><path d="M3 9h14v8a5 5 0 01-5 5H8a5 5 0 01-5-5z"/><path d="M7 2.5v2"/><path d="M11 2.5v2"/><path d="M15 2.5v2"/></svg>',
+        gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 008.6 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 8.6a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9v0a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>',
+        soundOn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18.5 5.5a9.4 9.4 0 010 13"/></svg>',
+        soundOff: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M22 9l-6 6"/><path d="M16 9l6 6"/></svg>'
+    };
+    // 行内平面图标组（统一描边 2、当前色，随字号缩放）
+    const ICON = {
+        coin: '<svg class="ic-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.8 7.5l3.2 4 3.2-4"/><path d="M12 11.5V17"/><path d="M9.5 14.5h5"/></svg>',
+        check: '<svg class="ic-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.6 2.6L16 9.5"/></svg>',
+        done: '<svg class="ic-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5 10-11"/></svg>'
+    };
 
+    const DUR_ROW_H = 44;                       // 时长滚轮单行高度
+    const DUR_DEFAULT = [5, 10, 15, 25, 45];    // 默认常用专注时长（分钟）
+    const BREAK_DEFAULT = [3, 5, 10, 15];       // 默认常用休息时长（分钟）
+    const BREAK_MIN = 5 * 60 * 1000;            // 休息时长缺省值
+    // phase: 'work' 专注阶段 | 'break' 休息阶段（仅番茄钟使用）
+    let focus = { id:null, ds:null, mode:'pomodoro', phase:'work', style:'ring', state:'idle', picking:true, elapsed:0, sessionMs:0, baseSeconds:0, total:25*60*1000, lastTs:0, prevState:'idle', stars:0 };
+    let focusDur = { countdown: 25*60*1000, pomodoro: 25*60*1000, break: BREAK_MIN };   // 各模式记住上次时长
+    let focusPresets = [];
+    let breakPresets = [];
+    let focusTimerId = null;
+    let durScrollTimer = null;
+
+    function loadFocusPresets() {
+        try {
+            const p = JSON.parse(localStorage.getItem('oc_focusPresets'));
+            focusPresets = Array.isArray(p) ? p.filter(m => m > 0) : [...DUR_DEFAULT];
+        } catch(e) { focusPresets = [...DUR_DEFAULT]; }
+        if(!Array.isArray(focusPresets)) focusPresets = [...DUR_DEFAULT];
+        try {
+            const b = JSON.parse(localStorage.getItem('oc_breakPresets'));
+            breakPresets = Array.isArray(b) ? b.filter(m => m > 0) : [...BREAK_DEFAULT];
+        } catch(e) { breakPresets = [...BREAK_DEFAULT]; }
+        if(!Array.isArray(breakPresets)) breakPresets = [...BREAK_DEFAULT];
+        // 上次使用的时长（专注 / 休息）
+        try {
+            const c = JSON.parse(localStorage.getItem('oc_focusCfg'));
+            if(c) ['countdown','pomodoro','break'].forEach(k => { if(c[k] > 0) focusDur[k] = c[k]; });
+        } catch(e) {}
+    }
+    function saveFocusPresets() { localStorage.setItem('oc_focusPresets', JSON.stringify(focusPresets)); }
+    function saveBreakPresets() { localStorage.setItem('oc_breakPresets', JSON.stringify(breakPresets)); }
+    function saveFocusCfg() { localStorage.setItem('oc_focusCfg', JSON.stringify(focusDur)); }
+    // 当前阶段（只认番茄钟）对应的时长存储键 / 常用时长列表
+    function focusDurKey() { return focus.phase === 'break' ? 'break' : focus.mode; }
+    function curPresets() { return focus.phase === 'break' ? breakPresets : focusPresets; }
+
+    // 取到可写任务引用（循环任务缺省时补建当日记录）
+    function findTaskRef(id, ds) {
+        const rec = getRec(ds);
+        const ci = cyclicTasks.findIndex(ct => ct.id === id);
+        if(ci !== -1) {
+            let e = rec.tasks.find(t => t.id===id && t.isCyclic);
+            if(!e) {
+                e = {id, name:cyclicTasks[ci].name, reward:cyclicTasks[ci].reward, done:false, isCyclic:true, group: cyclicTasks[ci].group || ''};
+                rec.tasks.push(e);
+            }
+            return e;
+        }
+        return rec.tasks.find(t => t.id===id && !t.isCyclic) || null;
+    }
+
+    function fmtFocusTime(ms) {
+        const s = Math.max(0, Math.floor(ms/1000));
+        return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+    }
+    function focusLimitMs() { return focus.mode === 'countup' ? 0 : focus.total; }
+    // 当前应显示的毫秒：正计时=已用时；倒计时/番茄钟/休息=剩余
+    function focusDisplayMs() {
+        const lim = focusLimitMs();
+        return lim ? Math.max(0, lim - focus.elapsed) : focus.elapsed;
+    }
+    // 计时累计：elapsed 只算当前阶段，sessionMs 只累计「专注」时长（休息不计入）
+    function accumFocus(now) {
+        const delta = now - focus.lastTs;
+        focus.lastTs = now;
+        focus.elapsed += delta;
+        if(focus.phase === 'work') focus.sessionMs += delta;
+    }
+
+    function setFlipDigit(elId, val) {
+        const el = document.getElementById(elId);
+        if(!el || el.textContent === val) return;
+        el.textContent = val;
+        const card = el.parentElement;
+        card.classList.remove('flipping');
+        void card.offsetWidth;
+        card.classList.add('flipping');
+    }
+
+    function renderFocusClock() {
+        const ms = focusDisplayMs();
+        document.getElementById('ringTime').textContent = fmtFocusTime(ms);
+        const lim = focusLimitMs();
+        const p = lim ? Math.min(1, focus.elapsed/lim) : (focus.elapsed % 60000)/60000;
+        const prog = document.getElementById('ringProg');
+        prog.setAttribute('stroke-dasharray', FOCUS_RING_C);
+        prog.setAttribute('stroke-dashoffset', FOCUS_RING_C * (1 - p));
+        document.getElementById('ringDot').setAttribute('transform', `rotate(${p*360} 130 130)`);
+        const mm = String(Math.floor(ms/60000)).padStart(2,'0').slice(-2);
+        const ss = String(Math.floor(ms/1000)%60).padStart(2,'0');
+        setFlipDigit('fMinT', mm[0]);
+        setFlipDigit('fMinU', mm[1]);
+        setFlipDigit('fSecT', ss[0]);
+        setFlipDigit('fSecU', ss[1]);
+    }
+
+    function renderFocusStars() {
+        const wrap = document.getElementById('focusStars');
+        // 常驻占位：非番茄钟仅隐藏可见性，行高不变 → 三种模式时钟位置严格一致
+        wrap.style.visibility = focus.mode === 'pomodoro' ? 'visible' : 'hidden';
+        if(focus.mode !== 'pomodoro') return;
+        const n = Math.max(0, focus.stars);
+        // 单行封顶 10 颗（280px 内），超出用 ×N 计数，避免换行撑高导致时钟移动
+        const shown = Math.min(n, 10);
+        let html = Array(shown).fill(FOCUS_ICON.star).join('');
+        if(n > 10) html += '<span class="stars-more">× ' + n + '</span>';
+        wrap.innerHTML = html;
+    }
+
+    // 顶部阶段提示：番茄钟第 N 轮 / 休息中
+    function renderFocusPhase() {
+        const el = document.getElementById('focusPhase');
+        if(focus.mode !== 'pomodoro') { el.className = 'focus-phase'; el.textContent = ''; return; }
+        if(focus.phase === 'break') {
+            el.className = 'focus-phase show is-break';
+            el.innerHTML = FOCUS_ICON.tea + '<span>休息中</span>';
+        } else {
+            el.className = 'focus-phase show';
+            el.textContent = '第 ' + (focus.stars + 1) + ' 轮专注';
+        }
+    }
+
+    function renderFocusActions() {
+        const el = document.getElementById('focusActions');
+        const isBreak = focus.phase === 'break';
+        let html;
+        if(focus.state === 'idle') {
+            if(isBreak) {
+                // 一轮专注结束：停下来等用户决定（开始休息 / 跳过休息 / 直接完成任务）
+                html = `<button class="focus-btn ghost" onclick="focusAskFinish()">完成</button><button class="focus-btn ghost" onclick="focusSkipBreak()">跳过休息</button><button class="focus-btn primary" onclick="focusStart()">开始休息</button>`;
+            } else {
+                html = `<button class="focus-btn primary" onclick="focusStart()">开始</button>`;
+            }
+        } else if(focus.state === 'running') {
+            if(isBreak) html = `<button class="focus-btn ghost" onclick="focusPause()">暂停</button><button class="focus-btn primary" onclick="focusEndBreak()">结束休息</button>`;
+            else html = `<button class="focus-btn ghost" onclick="focusPause()">暂停</button><button class="focus-btn primary" onclick="focusAskFinish()">完成</button>`;
+        } else {
+            if(isBreak) html = `<button class="focus-btn ghost" onclick="focusStart()">继续休息</button><button class="focus-btn primary" onclick="focusEndBreak()">结束休息</button>`;
+            else html = `<button class="focus-btn ghost" onclick="focusStart()">继续</button><button class="focus-btn primary" onclick="focusAskFinish()">完成</button>`;
+        }
+        el.innerHTML = html;
+        // 按钮数 ≥3 时收窄并给右下角工具列让位
+        el.className = 'focus-actions' + (el.children.length >= 3 ? ' compact' : '');
+    }
+
+    function renderFocus() {
+        const durMode = focus.mode !== 'countup';
+        const picking = durMode && focus.state === 'idle' && focus.picking;
+        // 圆环：圆环样式常驻；选择时长时也显示，作为滚轮的底衬
+        const showRing = focus.style === 'ring' || picking;
+        document.getElementById('ringWrap').style.display = showRing ? '' : 'none';
+        document.getElementById('focusFlip').style.display = (focus.style === 'flip' && !picking) ? 'grid' : 'none';
+        const timeEl = document.getElementById('ringTime');
+        timeEl.style.display = picking ? 'none' : '';
+        timeEl.classList.toggle('tappable', durMode && focus.state === 'idle');
+        document.getElementById('ringPicker').style.display = picking ? 'block' : 'none';
+        document.getElementById('focusStyleBtn').innerHTML = (focus.style === 'ring' ? FOCUS_ICON.flip : FOCUS_ICON.ring) + '<span>样式</span>';
+        document.getElementById('focusSoundBtn').innerHTML = (tickSoundOn ? FOCUS_ICON.soundOn : FOCUS_ICON.soundOff) + '<span>声音</span>';
+        document.getElementById('focusPresetBtn').style.display = durMode ? '' : 'none';
+        document.getElementById('focusPresetBtn').innerHTML = FOCUS_ICON.gear + '<span>设置</span>';
+        // 计时中 / 休息阶段 锁定模式切换
+        const modesEl = document.getElementById('focusModes');
+        const locked = focus.state === 'running' || focus.phase === 'break';
+        modesEl.classList.toggle('locked', locked);
+        modesEl.querySelectorAll('button').forEach(b => b.setAttribute('aria-disabled', locked ? 'true' : 'false'));
+        // 休息阶段换色
+        document.getElementById('focusOverlay').classList.toggle('breaking', focus.phase === 'break');
+        renderFocusPhase();
+        if(picking) buildDurationWheel();
+        renderFocusStars();
+        renderFocusActions();
+        renderFocusClock();
+    }
+
+    // ====== 时长选择（滚轮：自定义 + 常用时长） ======
+    function buildDurationWheel() {
+        const list = document.getElementById('durList');
+        const cur = Math.round(focus.total/60000);
+        const presets = curPresets();
+        const items = [{label:'自定义', min:null}, ...presets.map(m => ({label:String(m), min:m}))];
+        const noneMatch = !presets.includes(cur);
+        list.innerHTML = items.map(it => {
+            const active = it.min == null ? noneMatch : it.min === cur;
+            return `<div class="dur-item${active?' active':''}" data-min="${it.min == null ? '' : it.min}" data-custom="${it.min == null ? 1 : 0}">${it.label}</div>`;
+        }).join('');
+        const activeEl = list.querySelector('.dur-item.active') || list.children[0];
+        // 保证目标位置落在可滚动范围内，避免被钳制后错位到相邻项
+        const maxTop = Math.max(0, list.scrollHeight - list.clientHeight);
+        list.scrollTop = Math.min(maxTop, Math.max(0, [...list.children].indexOf(activeEl) * DUR_ROW_H));
+        list.onscroll = onDurScroll;
+        list.onclick = onDurClick;
+    }
+    function onDurScroll() {
+        clearTimeout(durScrollTimer);
+        durScrollTimer = setTimeout(() => {
+            const list = document.getElementById('durList');
+            if(!list || !list.children.length) return;
+            // 只在待机选时长时生效，避免开始计时后滚轮的延迟回调又改动时长
+            if(focus.state !== 'idle' || !focus.picking) return;
+            // 以「视觉中心」判定当前项：不受滚动对齐 / padding 影响
+            const mid = list.scrollTop + list.clientHeight / 2;
+            let idx = 0, best = Infinity;
+            [...list.children].forEach((c, i) => {
+                const d = Math.abs((c.offsetTop + c.offsetHeight / 2) - mid);
+                if(d < best) { best = d; idx = i; }
+            });
+            const el = list.children[idx];
+            [...list.children].forEach(c => c.classList.toggle('active', c === el));
+            if(el.dataset.custom !== '1') {
+                const next = parseInt(el.dataset.min, 10) * 60000;
+                if(next !== focus.total) {
+                    focus.total = next;
+                    focusDur[focusDurKey()] = focus.total;
+                    saveFocusCfg();
+                    renderFocusClock();   // 时长与钟面保持同步，杜绝「显示 25 实际 15」
+                }
+            }
+        }, 130);
+    }
+    function onDurClick(e) {
+        const el = e.target.closest('.dur-item');
+        if(!el) return;
+        if(el.dataset.custom === '1') { openDurCustom(); return; }
+        setFocusDuration(parseInt(el.dataset.min, 10));
+    }
+    function setFocusDuration(min) {
+        focus.total = min * 60000;
+        focusDur[focusDurKey()] = focus.total;
+        saveFocusCfg();
+        focus.elapsed = 0;
+        focus.picking = false;
+        renderFocus();
+    }
+    function openDurCustom() {
+        document.getElementById('durCustomInput').value = Math.round(focus.total/60000);
+        document.getElementById('durCustomOverlay').style.display = 'flex';
+        setTimeout(() => document.getElementById('durCustomInput').select(), 50);
+    }
+    window.removePreset = function(min) {
+        focusPresets = focusPresets.filter(m => m !== min);
+        saveFocusPresets();
+        renderPresetList();
+    };
+    window.removeBreakPreset = function(min) {
+        breakPresets = breakPresets.filter(m => m !== min);
+        saveBreakPresets();
+        renderPresetList();
+    };
+    // 常用时长分组渲染：kind = 'work' | 'break'
+    function renderPresetSection(elId, listRef, kind) {
+        const el = document.getElementById(elId);
+        if(!el) return;
+        const isBreak = kind === 'break';
+        const delFn = isBreak ? 'removeBreakPreset' : 'removePreset';
+        const commitFn = isBreak ? 'commitNewBreakPreset' : 'commitNewPreset';
+        const inputId = isBreak ? 'breakNewInput' : 'presetNewInput';
+        let html = listRef.map(m => `<div class="preset-row"><span>${m} 分钟</span><button class="preset-del" onclick="${delFn}(${m})">✕</button></div>`).join('');
+        if(!listRef.length) html += `<div class="empty-hint">还没有常用时长</div>`;
+        html += `<div class="gd-new-row"><span class="gd-new-label">＋ 添加常用时长</span></div>`;
+        el.innerHTML = html;
+        el.querySelector('.gd-new-row').onclick = function() {
+            this.outerHTML = `<div class="gd-new-row"><div class="gd-new-input"><input type="number" id="${inputId}" placeholder="分钟" min="1" max="600"><span class="gd-edit-btns"><button onclick="${commitFn}()" title="确定">✓</button><button onclick="renderPresetList()" title="取消">✕</button></span></div></div>`;
+            const inp = document.getElementById(inputId);
+            inp.focus();
+            inp.onkeydown = (e) => {
+                if(e.key === 'Enter') window[commitFn]();
+                if(e.key === 'Escape') renderPresetList();
+            };
+        };
+    }
+    function renderPresetList() {
+        renderPresetSection('presetList', focusPresets, 'work');
+        const breakSec = document.getElementById('breakSettingSection');
+        if(breakSec) breakSec.style.display = focus.mode === 'pomodoro' ? '' : 'none';
+        if(focus.mode === 'pomodoro') renderPresetSection('breakPresetList', breakPresets, 'break');
+    }
+    function addPreset(listRef, rawValue, saveFn) {
+        const min = parseInt(rawValue, 10);
+        if(!min || min < 1 || min > 600) { alert('请输入 1-600 之间的分钟数'); return false; }
+        if(listRef.includes(min)) { alert('该时长已存在'); return false; }
+        listRef.push(min);
+        listRef.sort((a,b) => a-b);
+        saveFn();
+        renderPresetList();
+        return true;
+    }
+    function commitNewPreset() {
+        const inp = document.getElementById('presetNewInput');
+        addPreset(focusPresets, inp ? inp.value : '', saveFocusPresets);
+    }
+    function commitNewBreakPreset() {
+        const inp = document.getElementById('breakNewInput');
+        addPreset(breakPresets, inp ? inp.value : '', saveBreakPresets);
+    }
+    window.commitNewPreset = commitNewPreset;
+    window.commitNewBreakPreset = commitNewBreakPreset;
+
+    function stopFocusTimer() {
+        if(focusTimerId) { clearInterval(focusTimerId); focusTimerId = null; }
+    }
+
+    // ====== 秒针音效（Web Audio 本地合成，无外部文件） ======
+    let tickSoundOn = localStorage.getItem('oc_tickSound') !== 'off';   // 默认开
+    let audioCtx = null;
+    let lastTickSec = null;   // 上次「响」的秒数，用于每秒触发一次
+    let tickFlip = false;     // tick / tock 交替，更像机械钟
+    function ensureAudio() {
+        try {
+            if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+        } catch(e) { audioCtx = null; }
+    }
+    // 短噪声脉冲过带通滤波 + 快速衰减包络 → 「擦」的秒针声
+    function playTick() {
+        if(!tickSoundOn || !audioCtx) return;
+        try {
+            const t = audioCtx.currentTime;
+            const dur = 0.05;
+            const buf = audioCtx.createBuffer(1, Math.ceil(audioCtx.sampleRate * dur), audioCtx.sampleRate);
+            const ch = buf.getChannelData(0);
+            for(let i = 0; i < ch.length; i++) ch[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / ch.length, 2.2);
+            const src = audioCtx.createBufferSource();
+            src.buffer = buf;
+            const bp = audioCtx.createBiquadFilter();
+            bp.type = 'bandpass';
+            bp.frequency.value = tickFlip ? 2100 : 2900;   // tock 略低、tick 略高
+            bp.Q.value = 7;
+            const g = audioCtx.createGain();
+            g.gain.setValueAtTime(0.15, t);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+            src.connect(bp); bp.connect(g); g.connect(audioCtx.destination);
+            src.start(t);
+        } catch(e) {}
+        tickFlip = !tickFlip;
+    }
+
+    // 番茄钟跑满一轮：记一颗星，停下来等用户选择是否开始休息
+    function onPomodoroDone() {
+        stopFocusTimer();
+        focus.elapsed = 0;
+        focus.stars += 1;
+        const ref = findTaskRef(focus.id, focus.ds);
+        if(ref) ref.pomodoros = (ref.pomodoros || 0) + 1;
+        persistFocusTime();
+        enterBreakReady();
+    }
+
+    // 任务总计时 = 本次进入前已累计(baseSeconds) + 本次专注时长(sessionMs)
+    // 覆盖式写入，保证外部列表展示与任务真实总时长始终一致；写完立即刷新列表
+    function persistFocusTime() {
+        const ref = findTaskRef(focus.id, focus.ds);
+        if(!ref) return;
+        ref.focusSeconds = (focus.baseSeconds || 0) + Math.round(focus.sessionMs/1000);
+        save();
+        renderDayView();
+    }
+
+    // 进入「休息待开始」：等用户点「开始休息」
+    function enterBreakReady() {
+        stopFocusTimer();
+        focus.phase = 'break';
+        focus.state = 'idle';
+        focus.picking = false;
+        focus.elapsed = 0;
+        focus.total = focusDur.break || BREAK_MIN;
+        renderFocus();
+    }
+
+    // 结束 / 跳过休息：回到专注阶段，等用户开始下一轮
+    window.focusEndBreak = function() {
+        stopFocusTimer();
+        focus.phase = 'work';
+        focus.state = 'idle';
+        focus.picking = false;
+        focus.elapsed = 0;
+        focus.total = focusDur.pomodoro || 25*60000;
+        renderFocus();
+    };
+    window.focusSkipBreak = function() { window.focusEndBreak(); };
+
+    // 休息倒计时跑满：自动回到专注阶段（第 N+1 轮），等用户开始
+    function onBreakDone() { window.focusEndBreak(); }
+
+    function focusTick() {
+        if(focus.state !== 'running') return;
+        const now = Date.now();
+        accumFocus(now);
+        const lim = focusLimitMs();
+        if(lim && focus.elapsed >= lim) {
+            focus.elapsed = lim;
+            lastTickSec = null;   // 本轮结束，重置秒针基准
+            if(focus.phase === 'break') { onBreakDone(); return; }
+            if(focus.mode === 'pomodoro') { onPomodoroDone(); return; }
+            focus.state = 'paused';
+            stopFocusTimer();
+            renderFocus();
+            return;
+        }
+        // 秒针「擦擦」声：显示秒数变化时触发一次（倒计时 / 正计时 / 休息通用）
+        const sec = Math.floor(focusDisplayMs() / 1000);
+        if(sec !== lastTickSec) { lastTickSec = sec; playTick(); }
+        renderFocusClock();
+    }
+
+    window.focusStart = function() {
+        stopFocusTimer();
+        ensureAudio();   // 借「开始」的用户手势解锁音频上下文
+        lastTickSec = null;
+        // 倒计时归零后点「继续」：从整段时长重新开始一轮
+        const lim = focusLimitMs();
+        if(lim && focus.elapsed >= lim) focus.elapsed = 0;
+        focus.picking = false;
+        focus.state = 'running';
+        focus.lastTs = Date.now();
+        focusTimerId = setInterval(focusTick, 100);
+        renderFocus();
+    };
+    window.focusPause = function() {
+        if(focus.state === 'running') accumFocus(Date.now());
+        focus.state = 'paused';
+        stopFocusTimer();
+        renderFocus();
+    };
+    window.focusAskFinish = function() {
+        focus.prevState = focus.state;
+        if(focus.state === 'running') focusPause();
+        document.getElementById('fcText').textContent = focus.phase === 'break' ? '确定要结束这次专注吗？' : '确定要退出专注模式吗？';
+        document.getElementById('focusConfirmOverlay').style.display = 'flex';
+    };
+
+    window.openFocus = function(id, ds) {
+        const ref = findTaskRef(id, ds);
+        if(!ref || ref.done) return;   // 规则：已完成任务不可进入专注
+        stopFocusTimer();
+        focus.id = id;
+        focus.ds = ds;
+        focus.mode = 'pomodoro';
+        focus.phase = 'work';
+        focus.style = focus.style || 'ring';
+        focus.state = 'idle';
+        focus.picking = true;
+        focus.elapsed = 0;
+        focus.sessionMs = 0;
+        focus.total = focusDur.pomodoro;
+        focus.stars = ref.pomodoros || 0;
+        focus.baseSeconds = ref.focusSeconds || 0;   // 记住进入前已累计的时长，结算时在此基础上累加
+        document.getElementById('focusTaskName').textContent = ref.name;
+        const g = getGroup(ref.group || '');
+        document.getElementById('focusTaskGroup').textContent = g ? g.name : '默认分组';
+        document.querySelectorAll('#focusModes button').forEach(b => b.classList.toggle('active', b.dataset.mode === focus.mode));
+        document.getElementById('focusOverlay').style.display = 'flex';
+        renderFocus();
+    };
+
+    function closeFocusOverlay() {
+        stopFocusTimer();
+        focus.state = 'idle';
+        focus.phase = 'work';
+        focus.elapsed = 0;
+        focus.sessionMs = 0;
+        focus.id = null;
+        document.getElementById('focusConfirmOverlay').style.display = 'none';
+        document.getElementById('focusOverlay').style.display = 'none';
+        document.getElementById('focusOverlay').classList.remove('breaking');
+    }
+
+    // 关闭：没开始计时直接退出，否则二次确认
+    document.getElementById('focusClose').onclick = function() {
+        if(focus.state === 'idle' && focus.sessionMs === 0) closeFocusOverlay();
+        else focusAskFinish();
+    };
+
+    // 二次确认：放弃 = 放弃本次专注（退出并清零计时，任务状态不变）；已完成 = 完成任务并结算
+    document.getElementById('fcAbandon').onclick = function() {
+        closeFocusOverlay();   // 停止计时、计时清零、关闭弹窗与专注层
+    };
+    document.getElementById('fcComplete').onclick = function() {
+        const ref = findTaskRef(focus.id, focus.ds);
+        if(ref) {
+            if(!ref.done) { ref.done = true; saved += (ref.reward || 0); }
+            // 任务总计时：进入前累计 + 本次专注总时长（含跑满的番茄轮次），不覆盖历史
+            ref.focusSeconds = (focus.baseSeconds || 0) + Math.round(focus.sessionMs/1000);
+            if(saved < 0) saved = 0;
+            save();
+            renderAll();
+        }
+        closeFocusOverlay();
+    };
+    // 点弹窗空白处 = 不退出，留在专注模式（计时中则恢复计时）
+    document.getElementById('focusConfirmOverlay').onclick = function(e) {
+        if(e.target !== this) return;
+        this.style.display = 'none';
+        if(focus.prevState === 'running') focusStart();
+    };
+
+    // 模式切换：计时中禁止；切换即重置本轮
+    document.getElementById('focusModes').onclick = function(e) {
+        const btn = e.target.closest('button');
+        if(!btn || btn.dataset.mode === focus.mode) return;
+        if(focus.state === 'running') { alert('⏳ 计时进行中，不能切换模式\n请先暂停或结束本次专注'); return; }
+        if(focus.phase === 'break') { alert('🍵 休息阶段不能切换模式\n请先结束休息'); return; }
+        // 已累计时长：切换会丢弃本轮，二次确认
+        if(focus.sessionMs > 0) {
+            if(!confirm('切换模式会重置本轮计时，确定吗？')) return;
+        }
+        stopFocusTimer();
+        focus.mode = btn.dataset.mode;
+        focus.phase = 'work';       // 切换模式即退出休息阶段
+        focus.elapsed = 0;
+        focus.sessionMs = 0;
+        focus.state = 'idle';
+        focus.picking = true;
+        focus.total = focusDur[focus.mode] || 25*60000;
+        this.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
+        renderFocus();
+    };
+
+    // 时钟样式切换（圆环 / 卡片翻页）
+    document.getElementById('focusStyleBtn').onclick = function() {
+        focus.style = focus.style === 'ring' ? 'flip' : 'ring';
+        renderFocus();
+    };
+
+    // 秒针音效开关：切换即试听一声，偏好持久化
+    document.getElementById('focusSoundBtn').onclick = function() {
+        tickSoundOn = !tickSoundOn;
+        localStorage.setItem('oc_tickSound', tickSoundOn ? 'on' : 'off');
+        lastTickSec = null;
+        if(tickSoundOn) { ensureAudio(); playTick(); }
+        renderFocus();
+    };
+
+    // 待机时点击时钟 → 重新选择时长（专注阶段选专注时长，休息阶段选休息时长）
+    document.getElementById('ringTime').onclick = function() {
+        if(focus.mode === 'countup' || focus.state !== 'idle') return;
+        focus.picking = true;
+        renderFocus();
+    };
+
+    // 自定义时长
+    document.getElementById('durCustomCancel').onclick = () => { document.getElementById('durCustomOverlay').style.display = 'none'; };
+    document.getElementById('durCustomOk').onclick = function() {
+        const min = parseInt(document.getElementById('durCustomInput').value, 10);
+        if(!min || min < 1 || min > 600) { alert('请输入 1-600 之间的分钟数'); return; }
+        document.getElementById('durCustomOverlay').style.display = 'none';
+        setFocusDuration(min);
+    };
+    document.getElementById('durCustomOverlay').onclick = function(e) { if(e.target === this) this.style.display = 'none'; };
+
+    // 常用时长设置
+    document.getElementById('focusPresetBtn').onclick = function() {
+        renderPresetList();
+        document.getElementById('presetOverlay').style.display = 'flex';
+    };
+    document.getElementById('presetDone').onclick = function() {
+        document.getElementById('presetOverlay').style.display = 'none';
+        if(focus.mode !== 'countup') renderFocus();
+    };
+    document.getElementById('presetOverlay').onclick = function(e) { if(e.target === this) this.style.display = 'none'; };
+
+    function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML.replace(/"/g,'&quot;'); }
+
+    loadFocusPresets();
     load();
     renderAll();
 
